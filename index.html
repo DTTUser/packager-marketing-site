@@ -280,6 +280,27 @@
     }
 
     /* Blog teaser */
+    .blog-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .see-all {
+      margin-top: 24px;
+      text-align: right;
+      font-size: 14px;
+    }
+
+    .see-all a {
+      color: var(--teal);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .see-all a:hover {
+      text-decoration: underline;
+    }
+
     .blog-card {
       background: var(--navy-card);
       border: 1px solid var(--navy-border);
@@ -427,7 +448,7 @@
       <nav class="nav-links">
         <a href="#what">What it does</a>
         <a href="#who">Who it is for</a>
-        <a href="#blog">Blog</a>
+        <a href="/blog/">Blog</a>
         <a href="#signup">Get early access</a>
       </nav>
     </div>
@@ -529,14 +550,48 @@
     <section id="blog">
       <div class="container">
         <h2>From the blog</h2>
-        <p class="section-lede">Practical notes on SCORM, LMSs, and the gap between AI-generated content and the systems that have to host it.</p>
+        <p class="section-lede">Practical, opinionated notes on SCORM, xAPI, and the gap between AI-generated content and the systems that have to host it.</p>
 
-        <a href="/blog/what-scorm-actually-tracks.html" class="blog-card">
-          <p class="blog-meta">28 May 2026, 6 minute read</p>
-          <h3>What SCORM actually tracks</h3>
-          <p>A short, practical guide to the five things SCORM 1.2 records, the things it does not, and why the difference matters for course design.</p>
-          <span class="read-more">Read post &rarr;</span>
-        </a>
+        <div class="blog-list" id="blog-teaser">
+          <a href="/blog/why-authoring-tools-hide-scorm-api.html" class="blog-card" data-publish-date="2026-07-07">
+            <p class="blog-meta">7 July 2026, 8 minute read</p>
+            <h3>Why authoring tools hide the SCORM API from you, and what you can do about it</h3>
+            <p>An honest look at the gap between what SCORM 1.2 actually offers and what authoring tools let you reach.</p>
+            <span class="read-more">Read post &rarr;</span>
+          </a>
+          <a href="/blog/testing-scorm-before-client.html" class="blog-card" data-publish-date="2026-06-30">
+            <p class="blog-meta">30 June 2026, 7 minute read</p>
+            <h3>How to test a SCORM package before sending it to a client</h3>
+            <p>A practical testing routine for SCORM packages. Catches the failure that would otherwise have embarrassed you.</p>
+            <span class="read-more">Read post &rarr;</span>
+          </a>
+          <a href="/blog/minimum-viable-scorm-manifest.html" class="blog-card" data-publish-date="2026-06-23">
+            <p class="blog-meta">23 June 2026, 9 minute read</p>
+            <h3>The minimum viable SCORM manifest, explained line by line</h3>
+            <p>The smallest valid SCORM 1.2 imsmanifest, explained without the historical detours.</p>
+            <span class="read-more">Read post &rarr;</span>
+          </a>
+          <a href="/blog/scorm-cloud-versus-client-lms.html" class="blog-card" data-publish-date="2026-06-16">
+            <p class="blog-meta">16 June 2026, 7 minute read</p>
+            <h3>Why your SCORM package works in SCORM Cloud but not in your client's LMS</h3>
+            <p>A practical debugging guide for the most universal frustration in instructional design.</p>
+            <span class="read-more">Read post &rarr;</span>
+          </a>
+          <a href="/blog/xapi-versus-scorm-1-2.html" class="blog-card" data-publish-date="2026-06-09">
+            <p class="blog-meta">9 June 2026, 8 minute read</p>
+            <h3>xAPI versus SCORM 1.2 in 2026, an honest comparison</h3>
+            <p>xAPI was supposed to replace SCORM years ago. SCORM 1.2 is still what every LMS actually runs on. Here is the honest version of why.</p>
+            <span class="read-more">Read post &rarr;</span>
+          </a>
+          <a href="/blog/what-scorm-actually-tracks.html" class="blog-card" data-publish-date="2026-05-28">
+            <p class="blog-meta">28 May 2026, 6 minute read</p>
+            <h3>What SCORM actually tracks</h3>
+            <p>A short, practical guide for anyone who has ever sworn at an LMS upload screen.</p>
+            <span class="read-more">Read post &rarr;</span>
+          </a>
+        </div>
+
+        <p class="see-all"><a href="/blog/">See all posts &rarr;</a></p>
       </div>
     </section>
 
@@ -573,5 +628,23 @@
     </div>
   </footer>
 
+  <script>
+    // Hide future-dated blog teaser cards and limit to 3 visible posts.
+    (function() {
+      var today = new Date().toISOString().slice(0, 10);
+      var cards = document.querySelectorAll("#blog-teaser .blog-card[data-publish-date]");
+      var shown = 0;
+      cards.forEach(function(card) {
+        var d = card.getAttribute("data-publish-date");
+        if (d && d > today) {
+          card.style.display = "none";
+        } else if (shown >= 3) {
+          card.style.display = "none";
+        } else {
+          shown++;
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

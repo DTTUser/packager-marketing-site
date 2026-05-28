@@ -1,6 +1,12 @@
-# What SCORM actually tracks
-
-*A short, practical guide for anyone who has ever sworn at an LMS upload screen.*
+---
+title: What SCORM actually tracks
+description: A short, practical guide to what SCORM 1.2 records, what it does not, and why the difference matters for course design.
+og_description: A short, practical guide for anyone who has ever sworn at an LMS upload screen.
+slug: what-scorm-actually-tracks
+date: 28 May 2026
+read_time: 6 minutes
+lede: A short, practical guide for anyone who has ever sworn at an LMS upload screen.
+---
 
 Most people who deal with SCORM have a vague sense of what it does. The LMS asks for a SCORM file, you give it a SCORM file, the LMS goes "thanks", and at some point a tick appears next to the learner's name. Job done.
 
