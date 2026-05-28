@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why your SCORM package works in SCORM Cloud but not in your client&#x27;s LMS, AI Learning Packager</title>
+  <meta name="description" content="The five most common reasons a SCORM package validates in SCORM Cloud but fails in a production LMS, and how to fix each one.">
+
+  <meta property="og:title" content="Why your SCORM package works in SCORM Cloud but not in your client&#x27;s LMS">
+  <meta property="og:description" content="The SCORM Cloud passes, the client LMS does not. Here are the five usual suspects.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://packager.dtttech.com/blog/scorm-cloud-versus-client-lms">
+  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy-deep: #0a0e27;
+      --navy-mid: #151a3d;
+      --navy-card: #1a2050;
+      --navy-border: #1e2650;
+      --teal: #00d4aa;
+      --teal-deep: #00b894;
+      --text-white: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6; min-height: 100vh;
+    }
+    body { background-attachment: fixed; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container-wide { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 24px 0; border-bottom: 1px solid var(--navy-border); }
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--text-white); text-decoration: none; letter-spacing: -0.3px; }
+    .brand span { color: var(--teal); }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--teal); }
+    .article-header { padding: 64px 0 32px; text-align: left; }
+    .eyebrow { display: inline-block; color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: 4px; margin-bottom: 20px; text-transform: uppercase; }
+    h1 { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin: 0 0 20px; }
+    .article-meta { color: var(--text-muted); font-size: 14px; margin: 0 0 8px; }
+    .article-meta a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+    .article-meta a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+    .lede { font-size: 19px; color: var(--text-muted); font-style: italic; margin: 24px 0 0; padding-left: 16px; border-left: 3px solid var(--teal); }
+    article { padding: 32px 0 64px; }
+    article h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin: 48px 0 16px; color: var(--text-white); }
+    article h2:first-of-type { margin-top: 0; }
+    article h3 { font-size: 19px; font-weight: 700; margin: 32px 0 12px; color: var(--text-white); }
+    article p { font-size: 17px; line-height: 1.7; color: var(--text-white); margin: 0 0 20px; }
+    article ul, article ol { margin: 0 0 20px; padding-left: 24px; }
+    article li { font-size: 17px; line-height: 1.7; color: var(--text-white); margin-bottom: 8px; }
+    article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(0, 212, 170, 0.4); }
+    article a:hover { border-bottom-color: var(--teal); }
+    article hr { border: none; border-top: 1px solid var(--navy-border); margin: 48px 0 32px; }
+    article code { font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; font-size: 14px; background: var(--navy-deep); border: 1px solid var(--navy-border); padding: 2px 6px; border-radius: 4px; color: var(--teal); }
+    article pre { background: var(--navy-deep); border: 1px solid var(--navy-border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 0 0 24px; }
+    article pre code { background: transparent; border: none; padding: 0; color: var(--text-white); font-size: 13px; line-height: 1.5; }
+    article blockquote { margin: 0 0 24px; padding: 16px 20px; border-left: 3px solid var(--teal); background: var(--navy-card); border-radius: 0 8px 8px 0; }
+    article blockquote p { margin: 0; color: var(--text-muted); font-style: italic; }
+    article .closing { color: var(--text-muted); font-size: 15px; font-style: italic; margin: 0; }
+    .cta-section { padding: 0 0 64px; }
+    .cta { background: linear-gradient(180deg, var(--navy-card), var(--navy-mid)); border: 1px solid var(--navy-border); border-radius: 20px; padding: 48px; text-align: center; }
+    .cta h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 12px; }
+    .cta p { color: var(--text-muted); margin: 0 0 28px; font-size: 16px; }
+    .signup-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; flex-wrap: wrap; }
+    .signup-form input[type="email"] { flex: 1; min-width: 240px; padding: 14px 18px; border-radius: 30px; border: 1px solid var(--navy-border); background: var(--navy-deep); color: var(--text-white); font-size: 15px; font-family: inherit; }
+    .signup-form input[type="email"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,212,170,0.2); }
+    .signup-form button { padding: 14px 28px; border-radius: 30px; border: none; background: var(--teal); color: var(--navy-deep); font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; transition: background 0.15s ease; }
+    .signup-form button:hover { background: var(--teal-deep); }
+    .form-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+    .hp-field { position: absolute; left: -5000px; visibility: hidden; }
+    footer { padding: 40px 0; border-top: 1px solid var(--navy-border); color: var(--text-muted); font-size: 14px; text-align: center; }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container-wide nav">
+      <a href="/" class="brand">AI Learning <span>Packager</span></a>
+      <nav class="nav-links">
+        <a href="/#what">What it does</a>
+        <a href="/#who">Who it is for</a>
+        <a href="/#blog">Blog</a>
+        <a href="/#signup">Get early access</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="article-header">
+        <div class="eyebrow">From the blog</div>
+        <h1>Why your SCORM package works in SCORM Cloud but not in your client&#x27;s LMS</h1>
+        <p class="article-meta">16 June 2026, by <a href="https://dtttech.com">Michael at Digital Technology Training</a>. About 7 minutes to read.</p>
+        <p class="lede">A practical debugging guide for the most universal frustration in instructional design.</p>
+      </div>
+      <article>
+        <h2>The pattern</h2>
+<p>You build a SCORM package. You upload it to SCORM Cloud, the industry's de facto SCORM tester. It passes. Green ticks across the board. You send it to the client. The client uploads it to their LMS. Something is wrong. The course will not launch, or it launches but does not track, or it tracks the wrong thing, or it tracks correctly for some learners but not others.</p>
+<p>This is one of the most universal frustrations in instructional design. SCORM Cloud is a strict, well-implemented SCORM player. Real-world LMSs are a patchwork of partial implementations, custom behaviours, and quirks accumulated over 25 years. Passing in SCORM Cloud is necessary but not sufficient.</p>
+<p>What follows is the five most common causes I have seen, in rough order of frequency, with the fix for each.</p>
+<h2>1. Manifest format and version mismatches</h2>
+<p>The most common cause. The client's LMS expects SCORM 1.2, you sent SCORM 2004, or vice versa. SCORM Cloud accepts both happily. Many LMSs accept only one, and the error message when they do not is usually unhelpful (often "package invalid" with no detail).</p>
+<p><strong>How to confirm:</strong> open the imsmanifest.xml inside your package. Look for the <code>schemaversion</code> element. SCORM 1.2 says "1.2". SCORM 2004 has a 3rd, 4th, or 5th Edition variant. The client's LMS documentation will tell you which they support, if you can find it.</p>
+<p><strong>How to fix:</strong> rebuild the package in the version the LMS expects. Most authoring tools have a publish setting for SCORM version. If your content is hand-rolled HTML, the manifest version is what you control.</p>
+<h2>2. Content type headers and character encoding</h2>
+<p>The LMS expects certain MIME types on the files inside the zip. If your HTML files are served as <code>text/plain</code> instead of <code>text/html</code>, the LMS may refuse to render them. If the LMS extracts the zip to a server with strict character encoding rules and your HTML uses a different encoding, the result is mojibake or a failed launch.</p>
+<p><strong>How to confirm:</strong> open the LMS's content viewer in Chrome with DevTools. The Network tab shows the actual <code>Content-Type</code> headers being served for each file. If <code>index.html</code> is coming back as <code>text/plain</code> or <code>application/octet-stream</code>, that is your problem.</p>
+<p><strong>How to fix:</strong> ensure the HTML files have a proper <code>&lt;meta charset="utf-8"&gt;</code> tag in the head. Add a <code>.htaccess</code> or equivalent file to the package if the LMS supports it, forcing the right MIME types. If the LMS strips these on upload, you may need to escalate to LMS support.</p>
+<h2>3. Case-sensitive file paths</h2>
+<p>The killer one. SCORM Cloud and most local testing tools run on case-insensitive file systems (Windows defaults, macOS in default mode). Many production LMSs run on Linux, which is case-sensitive. A reference to <code>Images/banner.png</code> works in testing and fails in production because the actual file is <code>images/banner.png</code>.</p>
+<p><strong>How to confirm:</strong> open the LMS's browser console in DevTools. Look for 404 errors. The URLs in the errors will tell you exactly which files are not loading.</p>
+<p><strong>How to fix:</strong> rename all files and folders to lowercase. Update all references in the HTML, CSS, and JavaScript. Use a tool like <code>git mv</code> to ensure the case change actually propagates to all platforms. Test the package on a Linux file system before sending, even if it is just <code>unzip</code> and serving via Python's built-in HTTP server on a Linux box.</p>
+<h2>4. Sequencing rules and launch behaviour</h2>
+<p>SCORM 2004 has sequencing rules that determine what learners can navigate to and when. Many LMSs implement these inconsistently. SCORM Cloud follows the spec strictly. The client's LMS may not. Result: the course launches but the learner cannot get past the first screen, or the LMS marks the course incomplete even after the learner reaches the end.</p>
+<p><strong>How to confirm:</strong> if your SCO has any sequencing in the manifest (look for <code>imsss:sequencing</code> elements), and the symptom is navigation-related, sequencing is the prime suspect.</p>
+<p><strong>How to fix:</strong> simplify or remove sequencing rules. For most courses, you do not need them. Mark the SCO as a single launchable unit with no internal sequencing constraints, and let the content itself handle navigation. This is one area where SCORM 1.2 is genuinely easier than SCORM 2004 because SCORM 1.2 has almost no sequencing concept.</p>
+<h2>5. JavaScript timing and the SCORM API</h2>
+<p>The course launches, content renders, but the LMS shows the learner as incomplete even after they reach the end. The cause is almost always the SCORM API call timing.</p>
+<p>The SCORM API is exposed by the LMS via a parent window or opener relationship. Your content has to find it before it can send any data. SCORM Cloud makes the API available immediately on load. Some LMSs delay it by a few hundred milliseconds while the launch frame initialises. If your content tries to call the API too early, it fails silently, and nothing gets sent.</p>
+<p><strong>How to confirm:</strong> open the LMS browser console. Look for errors like "API not found" or "LMSInitialize returned false". If you see these, the timing is the issue.</p>
+<p><strong>How to fix:</strong> wrap the SCORM API discovery in a retry loop with a short delay (50ms, up to 10 retries). Most well-built SCORM API wrappers do this by default. If your content is using a hand-rolled wrapper, replace it with a tested one.</p>
+<h2>Two bonus causes that are less common but worth knowing</h2>
+<p><strong>Iframe sandboxing.</strong> Some LMSs run SCORM content in a sandboxed iframe with restrictive permissions. If your content uses APIs that are blocked in sandboxes (clipboard, camera, fullscreen on certain browsers), it will fail. Workaround: detect the sandbox and provide a non-sandboxed fallback.</p>
+<p><strong>Single sign-on issues.</strong> Some LMSs hand off content launches via SSO redirects that strip query parameters. If your content reads the learner's ID or session token from the URL, it may be missing. Workaround: read these values from the SCORM API (<code>cmi.core.student_name</code>, <code>cmi.core.student_id</code>) rather than from the URL.</p>
+<h2>The general debugging approach</h2>
+<p>When a package fails in the client's LMS, work through this checklist before you escalate:</p>
+<p>First, open the LMS browser console while launching the course. Watch for errors. Most causes show themselves there.</p>
+<p>Second, compare the SCORM Cloud launch and the LMS launch side by side. What is different? URL structure, parent window setup, query parameters, file path resolution. The difference is usually the cause.</p>
+<p>Third, if you have access to the LMS server logs (rare, but ask), look at the file requests. 404s tell you the file path issue. 500s tell you a server-side processing issue.</p>
+<p>Fourth, isolate. Make the smallest possible SCORM package that exhibits the problem. A single HTML file calling <code>LMSInitialize</code> and <code>LMSFinish</code>. If even that fails, the problem is at the LMS level, not in your content.</p>
+<p>Fifth, only escalate to the client or LMS support after you have done the above. Vague "the package does not work" tickets get vague responses. Specific tickets with browser console output get useful responses.</p>
+<h2>Where the packager fits</h2>
+<p>The <a href="https://packager.dtttech.com">AI Learning Packager</a> was built with most of these gotchas already addressed. The manifest is SCORM 1.2 (sidestepping the version mismatch issue). All file names are lowercased. The included SCORM API wrapper handles the discovery timing. The manifest contains no sequencing rules to misfire.</p>
+<p>If you are still hitting LMS-specific issues with a packager-built zip, the cause is almost certainly in the HTML content itself rather than in the packaging, and the debugging steps above will find it.</p>
+<hr />
+<p><em>Built by Michael at <a href="https://dtttech.com">Digital Technology Training</a>. If you have wrestled with a SCORM upload that worked in SCORM Cloud but not in production, <a href="https://packager.dtttech.com">the packager</a> is in private beta. Request access below.</em></p>
+      </article>
+    </div>
+    <div class="container-wide cta-section">
+      <div class="cta">
+        <h2>Try the packager</h2>
+        <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds. Free for early testers.</p>
+        <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thanks.html" class="signup-form">
+          <input type="hidden" name="form-name" value="early-access">
+          <p class="hp-field"><label>Do not fill this out if you are human: <input name="bot-field"></label></p>
+          <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
+          <button type="submit">Request access</button>
+        </form>
+        <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container-wide">
+      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+    </div>
+  </footer>
+</body>
+</html>

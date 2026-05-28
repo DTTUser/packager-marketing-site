@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>xAPI versus SCORM 1.2 in 2026, an honest comparison, AI Learning Packager</title>
+  <meta name="description" content="A practical comparison of xAPI and SCORM 1.2, the trade-offs that actually matter, and how to decide which one your project needs.">
+
+  <meta property="og:title" content="xAPI versus SCORM 1.2 in 2026, an honest comparison">
+  <meta property="og:description" content="xAPI was supposed to replace SCORM by now. The honest version of what actually happened.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://packager.dtttech.com/blog/xapi-versus-scorm-1-2">
+  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy-deep: #0a0e27;
+      --navy-mid: #151a3d;
+      --navy-card: #1a2050;
+      --navy-border: #1e2650;
+      --teal: #00d4aa;
+      --teal-deep: #00b894;
+      --text-white: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6; min-height: 100vh;
+    }
+    body { background-attachment: fixed; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container-wide { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 24px 0; border-bottom: 1px solid var(--navy-border); }
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--text-white); text-decoration: none; letter-spacing: -0.3px; }
+    .brand span { color: var(--teal); }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--teal); }
+    .article-header { padding: 64px 0 32px; text-align: left; }
+    .eyebrow { display: inline-block; color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: 4px; margin-bottom: 20px; text-transform: uppercase; }
+    h1 { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin: 0 0 20px; }
+    .article-meta { color: var(--text-muted); font-size: 14px; margin: 0 0 8px; }
+    .article-meta a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+    .article-meta a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+    .lede { font-size: 19px; color: var(--text-muted); font-style: italic; margin: 24px 0 0; padding-left: 16px; border-left: 3px solid var(--teal); }
+    article { padding: 32px 0 64px; }
+    article h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin: 48px 0 16px; color: var(--text-white); }
+    article h2:first-of-type { margin-top: 0; }
+    article h3 { font-size: 19px; font-weight: 700; margin: 32px 0 12px; color: var(--text-white); }
+    article p { font-size: 17px; line-height: 1.7; color: var(--text-white); margin: 0 0 20px; }
+    article ul, article ol { margin: 0 0 20px; padding-left: 24px; }
+    article li { font-size: 17px; line-height: 1.7; color: var(--text-white); margin-bottom: 8px; }
+    article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(0, 212, 170, 0.4); }
+    article a:hover { border-bottom-color: var(--teal); }
+    article hr { border: none; border-top: 1px solid var(--navy-border); margin: 48px 0 32px; }
+    article code { font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; font-size: 14px; background: var(--navy-deep); border: 1px solid var(--navy-border); padding: 2px 6px; border-radius: 4px; color: var(--teal); }
+    article pre { background: var(--navy-deep); border: 1px solid var(--navy-border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 0 0 24px; }
+    article pre code { background: transparent; border: none; padding: 0; color: var(--text-white); font-size: 13px; line-height: 1.5; }
+    article blockquote { margin: 0 0 24px; padding: 16px 20px; border-left: 3px solid var(--teal); background: var(--navy-card); border-radius: 0 8px 8px 0; }
+    article blockquote p { margin: 0; color: var(--text-muted); font-style: italic; }
+    article .closing { color: var(--text-muted); font-size: 15px; font-style: italic; margin: 0; }
+    .cta-section { padding: 0 0 64px; }
+    .cta { background: linear-gradient(180deg, var(--navy-card), var(--navy-mid)); border: 1px solid var(--navy-border); border-radius: 20px; padding: 48px; text-align: center; }
+    .cta h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 12px; }
+    .cta p { color: var(--text-muted); margin: 0 0 28px; font-size: 16px; }
+    .signup-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; flex-wrap: wrap; }
+    .signup-form input[type="email"] { flex: 1; min-width: 240px; padding: 14px 18px; border-radius: 30px; border: 1px solid var(--navy-border); background: var(--navy-deep); color: var(--text-white); font-size: 15px; font-family: inherit; }
+    .signup-form input[type="email"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,212,170,0.2); }
+    .signup-form button { padding: 14px 28px; border-radius: 30px; border: none; background: var(--teal); color: var(--navy-deep); font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; transition: background 0.15s ease; }
+    .signup-form button:hover { background: var(--teal-deep); }
+    .form-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+    .hp-field { position: absolute; left: -5000px; visibility: hidden; }
+    footer { padding: 40px 0; border-top: 1px solid var(--navy-border); color: var(--text-muted); font-size: 14px; text-align: center; }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container-wide nav">
+      <a href="/" class="brand">AI Learning <span>Packager</span></a>
+      <nav class="nav-links">
+        <a href="/#what">What it does</a>
+        <a href="/#who">Who it is for</a>
+        <a href="/#blog">Blog</a>
+        <a href="/#signup">Get early access</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="article-header">
+        <div class="eyebrow">From the blog</div>
+        <h1>xAPI versus SCORM 1.2 in 2026, an honest comparison</h1>
+        <p class="article-meta">9 June 2026, by <a href="https://dtttech.com">Michael at Digital Technology Training</a>. About 8 minutes to read.</p>
+        <p class="lede">xAPI was supposed to replace SCORM years ago. SCORM 1.2 is still what every LMS actually runs on. Here is the honest version of why.</p>
+      </div>
+      <article>
+        <h2>The awkward truth, said out loud</h2>
+<p>xAPI has been "the future of e-learning" for over a decade. It was launched in 2013. It is now 2026. SCORM 1.2 is still what every commercial LMS actually accepts without configuration. If you have read this far, you already suspect this is the case, and you may even feel slightly disloyal for suspecting it. Do not.</p>
+<p>This post is the comparison written by someone who builds for both and is tired of the marketing version of the answer. It is structured around five questions that actually matter when you are choosing between them for a real project, and it ends with a one-page decision matrix.</p>
+<h2>What each one is, in plain language</h2>
+<p>SCORM 1.2 is a 2001 specification. The content sits inside the LMS. While the learner is taking the course, the content reports a small set of values back to the LMS (completed yes or no, passed yes or no, a score, a time, optional question results). The LMS stores these and shows them on its dashboard. The whole thing is self-contained.</p>
+<p>xAPI, also called Tin Can, is a 2013 specification. Content sends "statements" of the form "actor verb object" to a Learning Record Store, which is a database designed for this. The LRS may or may not live inside the LMS. The vocabulary is open-ended. You can record "Michael completed Module 4" but also "Michael watched a video for 12 seconds" or "Michael clicked the help button three times" or anything else you can describe.</p>
+<p>There is also cmi5, which is the bridge. cmi5 uses xAPI underneath but adds the bits SCORM had and xAPI lacked: a launch mechanism, sequencing, a course structure. If you want the data flexibility of xAPI and the LMS integration of SCORM, cmi5 is what you want, in theory. In practice, LMS support for cmi5 is patchy.</p>
+<h2>The five questions that actually matter</h2>
+<h3>1. What does the LMS accept?</h3>
+<p>SCORM 1.2 wins by a mile. Almost every LMS in 2026 accepts SCORM 1.2 natively, without configuration, without procurement involvement, without an IT review. Drop the zip in, the LMS knows what to do.</p>
+<p>xAPI requires a Learning Record Store. Some LMSs include one (Cornerstone, Docebo, some flavours of Moodle with the right plugin). Most do not. If the LRS is missing, your xAPI content has nowhere to send statements, and you are stuck.</p>
+<p>cmi5 is in the worst position of the three on this question. It needs both xAPI support and a cmi5-compliant launch mechanism. Adoption is growing but a long way from universal.</p>
+<p>If your project ends with "upload to the client's LMS and walk away", SCORM 1.2 is almost always the right answer for this reason alone.</p>
+<h3>2. What data can you capture?</h3>
+<p>xAPI wins by a mile. The vocabulary is genuinely open-ended. If you can describe what a learner did in three words (actor, verb, object), xAPI can record it.</p>
+<p>SCORM 1.2 is limited to the five primitives covered in the previous post: completion, success, score, time, and optional interactions. That is the whole list. You can be clever inside the interactions log to encode richer data, but it is a hack, and the LMS does not understand it as anything other than question results.</p>
+<p>If you genuinely need to record behaviour at the granularity of clicks, hovers, video plays, off-platform activity, cross-system journeys, simulator runs, or anything outside the "did they finish the course" frame, xAPI is the right tool and SCORM 1.2 is the wrong tool. Full stop.</p>
+<h3>3. What data can you act on?</h3>
+<p>This is where the conversation usually gets uncomfortable for xAPI advocates. Capturing data is not the same as doing anything useful with it.</p>
+<p>SCORM 1.2 captures less, but the LMS reporting is built around it. Out of the box, you can see who passed, who failed, who scored what, how long they took. Your client's training manager can run those reports on day one with no consultancy.</p>
+<p>xAPI captures more, but most LRSs make it hard to actually act on the captured data. Querying xAPI statements requires either a custom dashboard, a BI tool with an LRS connector, or someone willing to write JSON queries by hand. Most ID teams do not have any of these. The result, in real client environments, is "we are capturing a vast amount of xAPI data and looking at almost none of it".</p>
+<p>So the honest question is not "what can I capture", it is "what will the client actually look at six months after launch". For 90% of clients, the answer is the SCORM 1.2 dashboard.</p>
+<h3>4. Implementation effort</h3>
+<p>SCORM 1.2 is well-understood, well-documented, has 25 years of community knowledge behind it, and works the same in every LMS. The boring stable choice.</p>
+<p>xAPI is well-documented at the spec level, but the LRS landscape is fragmented. Different LRSs handle the same statements slightly differently. Most ID teams have never touched an LRS directly and would have to either learn or hire that capacity.</p>
+<p>cmi5 requires understanding both xAPI and the cmi5 launch envelope, plus an LMS that supports it. The upside is that when it works, you get the best of both. The downside is more moving parts.</p>
+<p>Rough effort multiplier for a typical project of comparable scope: SCORM 1.2 is the baseline at 1x. xAPI is 2x to 4x. cmi5 is 3x to 5x.</p>
+<h3>5. Future-proofing</h3>
+<p>This is where xAPI advocates lean, and they are mostly right, but the trend has been slow.</p>
+<p>The argument for xAPI being the future: it can describe modern learning experiences (mobile, simulator, on-the-job, microlearning, social) that SCORM cannot. The argument against: it has been the future for 13 years and SCORM 1.2 is still the present.</p>
+<p>SCORM 1.2 will not be replaced by an industry-wide alternative in the next five years. There is simply too much infrastructure built on it. It will eventually be replaced by something, but probably not by xAPI in its current form, and probably not within the working horizon of most current projects.</p>
+<p>So "future-proofing" is a real consideration, but a 5-to-10-year consideration, not a "this project we are starting next month" consideration.</p>
+<h2>The decision matrix</h2>
+<p>If you want a one-page version, here it is.</p>
+<p>Use <strong>SCORM 1.2</strong> when:</p>
+<ul>
+<li>The client's LMS is the only consumer of the data.</li>
+<li>You want the training manager to be able to pull reports without consultancy.</li>
+<li>The course is self-contained (one set of HTML or web content, one outcome to track).</li>
+<li>You do not know what kind of LRS the client has, which usually means they do not have one.</li>
+<li>You want the project to be finished on time.</li>
+</ul>
+<p>Use <strong>xAPI</strong> when:</p>
+<ul>
+<li>The client genuinely has an LRS in production and someone who knows how to query it.</li>
+<li>You need to track behaviour across multiple systems (LMS, mobile, simulator, on-the-job tools).</li>
+<li>The data capture is the point, and you have buyers for that data who will use it.</li>
+<li>The client is willing to pay for the additional setup and consultancy.</li>
+</ul>
+<p>Use <strong>cmi5</strong> when:</p>
+<ul>
+<li>You want xAPI flexibility plus SCORM-style LMS launch.</li>
+<li>You have confirmed the LMS supports cmi5 (do not assume).</li>
+<li>You are willing to be on the early end of the adoption curve.</li>
+</ul>
+<p>Use <strong>a custom backend integration</strong> (not SCORM, not xAPI) when:</p>
+<ul>
+<li>The data flow is unique enough that no standard fits.</li>
+<li>The LMS is not actually involved in the workflow.</li>
+<li>The team has the engineering capacity to build and maintain it.</li>
+</ul>
+<h2>Where the packager fits</h2>
+<p>The <a href="https://packager.dtttech.com">AI Learning Packager</a> currently emits SCORM 1.2 only, because that covers the 90% case. A future build could add cmi5 output, which would let the same wrapped HTML send xAPI statements while still launching from a SCORM-style manifest. Jeff Batt's open source <a href="https://github.com/jeffbatt01/scorm-drivers">scorm-drivers</a> project is the obvious template for that, layering an xAPI driver on top of a SCORM-conformant base.</p>
+<p>That feature lands when (and if) the SCORM 1.2 use case is validated. Right now, that validation is still in progress.</p>
+<h2>Closing thought</h2>
+<p>The argument against SCORM 1.2 is that it is 25 years old. The argument for it is that every LMS in the wild speaks it fluently. In 2026, both are still true. Either one being true is enough to keep it as the default for another decade.</p>
+<p>xAPI is not really the question. The question is whether your client's setup can actually use what xAPI captures. Most cannot. Some can. Know which one you are dealing with before you make the call.</p>
+<hr />
+<p><em>Built by Michael at <a href="https://dtttech.com">Digital Technology Training</a>. The AI Learning Packager is in private beta. If you want to try wrapping HTML content as SCORM 1.2 packages without touching an authoring tool, request access below.</em></p>
+      </article>
+    </div>
+    <div class="container-wide cta-section">
+      <div class="cta">
+        <h2>Try the packager</h2>
+        <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds. Free for early testers.</p>
+        <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thanks.html" class="signup-form">
+          <input type="hidden" name="form-name" value="early-access">
+          <p class="hp-field"><label>Do not fill this out if you are human: <input name="bot-field"></label></p>
+          <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
+          <button type="submit">Request access</button>
+        </form>
+        <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container-wide">
+      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+    </div>
+  </footer>
+</body>
+</html>

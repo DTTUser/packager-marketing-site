@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The minimum viable SCORM manifest, explained line by line, AI Learning Packager</title>
+  <meta name="description" content="A walk through the smallest valid SCORM 1.2 imsmanifest.xml, with every element explained.">
+
+  <meta property="og:title" content="The minimum viable SCORM manifest, explained line by line">
+  <meta property="og:description" content="The minimum SCORM 1.2 manifest, line by line. No fluff, no historical detours.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://packager.dtttech.com/blog/minimum-viable-scorm-manifest">
+  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy-deep: #0a0e27;
+      --navy-mid: #151a3d;
+      --navy-card: #1a2050;
+      --navy-border: #1e2650;
+      --teal: #00d4aa;
+      --teal-deep: #00b894;
+      --text-white: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6; min-height: 100vh;
+    }
+    body { background-attachment: fixed; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container-wide { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 24px 0; border-bottom: 1px solid var(--navy-border); }
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--text-white); text-decoration: none; letter-spacing: -0.3px; }
+    .brand span { color: var(--teal); }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--teal); }
+    .article-header { padding: 64px 0 32px; text-align: left; }
+    .eyebrow { display: inline-block; color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: 4px; margin-bottom: 20px; text-transform: uppercase; }
+    h1 { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin: 0 0 20px; }
+    .article-meta { color: var(--text-muted); font-size: 14px; margin: 0 0 8px; }
+    .article-meta a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+    .article-meta a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+    .lede { font-size: 19px; color: var(--text-muted); font-style: italic; margin: 24px 0 0; padding-left: 16px; border-left: 3px solid var(--teal); }
+    article { padding: 32px 0 64px; }
+    article h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin: 48px 0 16px; color: var(--text-white); }
+    article h2:first-of-type { margin-top: 0; }
+    article h3 { font-size: 19px; font-weight: 700; margin: 32px 0 12px; color: var(--text-white); }
+    article p { font-size: 17px; line-height: 1.7; color: var(--text-white); margin: 0 0 20px; }
+    article ul, article ol { margin: 0 0 20px; padding-left: 24px; }
+    article li { font-size: 17px; line-height: 1.7; color: var(--text-white); margin-bottom: 8px; }
+    article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(0, 212, 170, 0.4); }
+    article a:hover { border-bottom-color: var(--teal); }
+    article hr { border: none; border-top: 1px solid var(--navy-border); margin: 48px 0 32px; }
+    article code { font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; font-size: 14px; background: var(--navy-deep); border: 1px solid var(--navy-border); padding: 2px 6px; border-radius: 4px; color: var(--teal); }
+    article pre { background: var(--navy-deep); border: 1px solid var(--navy-border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 0 0 24px; }
+    article pre code { background: transparent; border: none; padding: 0; color: var(--text-white); font-size: 13px; line-height: 1.5; }
+    article blockquote { margin: 0 0 24px; padding: 16px 20px; border-left: 3px solid var(--teal); background: var(--navy-card); border-radius: 0 8px 8px 0; }
+    article blockquote p { margin: 0; color: var(--text-muted); font-style: italic; }
+    article .closing { color: var(--text-muted); font-size: 15px; font-style: italic; margin: 0; }
+    .cta-section { padding: 0 0 64px; }
+    .cta { background: linear-gradient(180deg, var(--navy-card), var(--navy-mid)); border: 1px solid var(--navy-border); border-radius: 20px; padding: 48px; text-align: center; }
+    .cta h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 12px; }
+    .cta p { color: var(--text-muted); margin: 0 0 28px; font-size: 16px; }
+    .signup-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; flex-wrap: wrap; }
+    .signup-form input[type="email"] { flex: 1; min-width: 240px; padding: 14px 18px; border-radius: 30px; border: 1px solid var(--navy-border); background: var(--navy-deep); color: var(--text-white); font-size: 15px; font-family: inherit; }
+    .signup-form input[type="email"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,212,170,0.2); }
+    .signup-form button { padding: 14px 28px; border-radius: 30px; border: none; background: var(--teal); color: var(--navy-deep); font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; transition: background 0.15s ease; }
+    .signup-form button:hover { background: var(--teal-deep); }
+    .form-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+    .hp-field { position: absolute; left: -5000px; visibility: hidden; }
+    footer { padding: 40px 0; border-top: 1px solid var(--navy-border); color: var(--text-muted); font-size: 14px; text-align: center; }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container-wide nav">
+      <a href="/" class="brand">AI Learning <span>Packager</span></a>
+      <nav class="nav-links">
+        <a href="/#what">What it does</a>
+        <a href="/#who">Who it is for</a>
+        <a href="/#blog">Blog</a>
+        <a href="/#signup">Get early access</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="article-header">
+        <div class="eyebrow">From the blog</div>
+        <h1>The minimum viable SCORM manifest, explained line by line</h1>
+        <p class="article-meta">23 June 2026, by <a href="https://dtttech.com">Michael at Digital Technology Training</a>. About 9 minutes to read.</p>
+        <p class="lede">The smallest valid SCORM 1.2 imsmanifest, explained without the historical detours.</p>
+      </div>
+      <article>
+        <h2>Why bother reading this</h2>
+<p>If you use an authoring tool, the SCORM manifest is generated for you and you may never look at it. That works until it does not. The day a client LMS rejects your package with "manifest invalid" and no further detail, you are going to want to know what the manifest actually says.</p>
+<p>This post walks through the smallest possible valid SCORM 1.2 imsmanifest.xml, line by line. It is the file the AI Learning Packager generates by default. Read this once and you can debug almost any SCORM 1.2 packaging problem.</p>
+<h2>The full file</h2>
+<p>Here is the whole thing, minus content-specific values:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;manifest identifier=&quot;com.example.course1&quot;
+          version=&quot;1.0&quot;
+          xmlns=&quot;http://www.imsproject.org/xsd/imscp_rootv1p1p2&quot;
+          xmlns:adlcp=&quot;http://www.adlnet.org/xsd/adlcp_rootv1p2&quot;
+          xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+          xsi:schemaLocation=&quot;http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd
+                              http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd
+                              http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd&quot;&gt;
+  &lt;metadata&gt;
+    &lt;schema&gt;ADL SCORM&lt;/schema&gt;
+    &lt;schemaversion&gt;1.2&lt;/schemaversion&gt;
+  &lt;/metadata&gt;
+  &lt;organizations default=&quot;ORG-1&quot;&gt;
+    &lt;organization identifier=&quot;ORG-1&quot;&gt;
+      &lt;title&gt;Course Title Here&lt;/title&gt;
+      &lt;item identifier=&quot;ITEM-1&quot; identifierref=&quot;RES-1&quot;&gt;
+        &lt;title&gt;Course Title Here&lt;/title&gt;
+      &lt;/item&gt;
+    &lt;/organization&gt;
+  &lt;/organizations&gt;
+  &lt;resources&gt;
+    &lt;resource identifier=&quot;RES-1&quot;
+              type=&quot;webcontent&quot;
+              adlcp:scormtype=&quot;sco&quot;
+              href=&quot;index.html&quot;&gt;
+      &lt;file href=&quot;index.html&quot;/&gt;
+    &lt;/resource&gt;
+  &lt;/resources&gt;
+&lt;/manifest&gt;
+</code></pre>
+<p>That is the entire valid SCORM 1.2 manifest. About 25 lines. Now let us walk it.</p>
+<h2>Line by line</h2>
+<h3>The XML declaration</h3>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+</code></pre>
+<p>Standard XML preamble. The encoding must be <code>UTF-8</code>. Some LMSs choke on other encodings. The version must be 1.0 (this is the XML version, not the SCORM version).</p>
+<h3>The manifest element</h3>
+<pre><code class="language-xml">&lt;manifest identifier=&quot;com.example.course1&quot;
+          version=&quot;1.0&quot;
+          xmlns=&quot;http://www.imsproject.org/xsd/imscp_rootv1p1p2&quot;
+          xmlns:adlcp=&quot;http://www.adlnet.org/xsd/adlcp_rootv1p2&quot;
+          xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+          xsi:schemaLocation=&quot;...&quot;&gt;
+</code></pre>
+<p>The <code>manifest</code> element is the root of the document. A few things matter:</p>
+<p><code>identifier</code> is a globally unique identifier for this package. The convention is reverse-DNS (<code>com.dtttech.scorm-intro-101</code>) but any unique string works. The LMS uses this to recognise the package on re-upload.</p>
+<p><code>version</code> is the version of this package (your version, not the SCORM version). Increment it when you re-publish. Some LMSs will reject re-uploads with the same version, others will re-import without warning.</p>
+<p>The four namespace declarations (<code>xmlns:...</code>) point to the XML schemas the manifest conforms to. Do not change these. They look ugly but they are what makes the file valid.</p>
+<p><code>xsi:schemaLocation</code> lists the same schemas plus their physical .xsd filenames. These .xsd files do not need to be in the package, the LMS will use its own copies, but their names must match the spec. Again, do not change.</p>
+<h3>The metadata block</h3>
+<pre><code class="language-xml">&lt;metadata&gt;
+  &lt;schema&gt;ADL SCORM&lt;/schema&gt;
+  &lt;schemaversion&gt;1.2&lt;/schemaversion&gt;
+&lt;/metadata&gt;
+</code></pre>
+<p>This is where you declare which SCORM version the package targets. <code>1.2</code> is what you want for SCORM 1.2. For SCORM 2004 you would write <code>2004 3rd Edition</code> or similar.</p>
+<p>Note: the <code>schemaversion</code> element is what most LMSs actually read to decide which SCORM API to expose. If you say "1.2" here but your content calls SCORM 2004 APIs, you will get silent failures.</p>
+<h3>Organizations</h3>
+<pre><code class="language-xml">&lt;organizations default=&quot;ORG-1&quot;&gt;
+  &lt;organization identifier=&quot;ORG-1&quot;&gt;
+    &lt;title&gt;Course Title Here&lt;/title&gt;
+    &lt;item identifier=&quot;ITEM-1&quot; identifierref=&quot;RES-1&quot;&gt;
+      &lt;title&gt;Course Title Here&lt;/title&gt;
+    &lt;/item&gt;
+  &lt;/organization&gt;
+&lt;/organizations&gt;
+</code></pre>
+<p>The <code>organizations</code> element describes the structure the LMS will show in its menu or table of contents. Even if your course is a single page, you still need this.</p>
+<p><code>default="ORG-1"</code> says which organization to use if there are multiple. There is almost never more than one. Just match this attribute to the identifier of your single organization.</p>
+<p>Inside the <code>organization</code> element, the <code>title</code> is what shows in the LMS course catalogue. Make this descriptive and unique. "Course Title Here" is fine for development, useless in production.</p>
+<p>The <code>item</code> element is a single launchable thing inside the organization. For a single-page SCORM, you have one item. For a multi-module SCORM, you would have nested items.</p>
+<p><code>identifierref="RES-1"</code> is the critical link. It connects this item to a resource (a file or set of files) defined further down. Get this wrong and the LMS will not know what to launch.</p>
+<h3>Resources</h3>
+<pre><code class="language-xml">&lt;resources&gt;
+  &lt;resource identifier=&quot;RES-1&quot;
+            type=&quot;webcontent&quot;
+            adlcp:scormtype=&quot;sco&quot;
+            href=&quot;index.html&quot;&gt;
+    &lt;file href=&quot;index.html&quot;/&gt;
+  &lt;/resource&gt;
+&lt;/resources&gt;
+</code></pre>
+<p>This is where the actual files in the package are declared.</p>
+<p><code>identifier="RES-1"</code> must match the <code>identifierref</code> from the item above. The two link the menu structure to the actual content.</p>
+<p><code>type="webcontent"</code> tells the LMS this is HTML (rather than, say, a downloadable PDF or an external asset). Almost always <code>webcontent</code>.</p>
+<p><code>adlcp:scormtype="sco"</code> is the most important attribute on this element. <code>sco</code> means "Shareable Content Object", which means the content will talk back to the LMS via the SCORM API. The other option is <code>asset</code>, which means the content is dumb (just a file, no API calls). If you want completion tracking, you want <code>sco</code>. If you change this to <code>asset</code>, the LMS will not even try to listen for completion calls.</p>
+<p><code>href="index.html"</code> is the file the LMS launches when the learner clicks the course. This is your entry point.</p>
+<p>The nested <code>file</code> element lists every file in the package. Strictly speaking, SCORM 1.2 only requires the entry point file to be listed. In practice, listing all of them is safer because some LMSs use this list to decide what to extract or serve. If your package has CSS, JS, images, video, list them all here.</p>
+<h2>What you can leave out</h2>
+<p>The above is the minimum. SCORM 1.2 allows much more, but you do not need any of it for a working package:</p>
+<p>You do not need sequencing rules. SCORM 1.2 has almost none, and what little exists is rarely useful for single-SCO packages.</p>
+<p>You do not need detailed metadata (author, date, copyright). The LMS will not show most of it, and what it does show comes from its own course catalogue rather than the manifest.</p>
+<p>You do not need multiple organizations. One is fine.</p>
+<p>You do not need multiple resources unless you have multiple launchable items.</p>
+<p>You do not need imsss namespaces (those are for SCORM 2004 sequencing).</p>
+<p>The temptation when writing a manifest by hand is to add every possible attribute "just in case". Resist it. Extra attributes mean extra surface area for the LMS to misinterpret.</p>
+<h2>What you cannot leave out</h2>
+<p>Five things, in order of how badly the package breaks if they are missing:</p>
+<p>The <code>&lt;resource&gt;</code> with the correct <code>href</code> and <code>adlcp:scormtype="sco"</code>. Without this, the package will not launch.</p>
+<p>The <code>&lt;schemaversion&gt;1.2&lt;/schemaversion&gt;</code> (or equivalent for other SCORM versions). Without this, the LMS does not know which API to provide.</p>
+<p>The matching <code>identifierref</code> linking item to resource. Without this, the LMS does not know what to launch.</p>
+<p>The four XML namespaces on the <code>manifest</code> element. Without these, the manifest is not technically valid SCORM, and strict LMSs will reject it.</p>
+<p>The <code>&lt;title&gt;</code> inside the organization. Without this, the course appears nameless in the LMS catalogue. Some LMSs will refuse to import a course with no title.</p>
+<h2>Why the packager generates exactly this</h2>
+<p>The <a href="https://packager.dtttech.com">AI Learning Packager</a> generates a manifest that matches the above almost line for line. The reasons:</p>
+<p>It is the smallest valid SCORM 1.2 manifest. Smaller is better because there is less for an LMS to misinterpret.</p>
+<p>It uses sensible defaults for the values it does include (UTF-8, version 1.0, lowercased identifiers based on the package name).</p>
+<p>It lists every file in the resource so LMSs that use the file list for extraction get the full set.</p>
+<p>It does not include sequencing, metadata, or anything optional. If your content needs more, you can edit the manifest after generation.</p>
+<p>That last point is worth highlighting. The packager's output is not a black box. The manifest is a plain text file in the zip. Open it, edit it, regenerate the zip. The wrapper does not stop you from going deeper than the defaults if you need to.</p>
+<hr />
+<p><em>Built by Michael at <a href="https://dtttech.com">Digital Technology Training</a>. The <a href="https://packager.dtttech.com">AI Learning Packager</a> is in private beta. Request access below.</em></p>
+      </article>
+    </div>
+    <div class="container-wide cta-section">
+      <div class="cta">
+        <h2>Try the packager</h2>
+        <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds. Free for early testers.</p>
+        <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thanks.html" class="signup-form">
+          <input type="hidden" name="form-name" value="early-access">
+          <p class="hp-field"><label>Do not fill this out if you are human: <input name="bot-field"></label></p>
+          <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
+          <button type="submit">Request access</button>
+        </form>
+        <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container-wide">
+      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+    </div>
+  </footer>
+</body>
+</html>

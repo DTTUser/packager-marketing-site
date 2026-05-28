@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to test a SCORM package before sending it to a client, AI Learning Packager</title>
+  <meta name="description" content="A practical four-stage testing workflow for SCORM packages, designed to catch problems before the client sees them.">
+
+  <meta property="og:title" content="How to test a SCORM package before sending it to a client">
+  <meta property="og:description" content="A four-stage testing routine for SCORM packages. Catches the failure that would have embarrassed you.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://packager.dtttech.com/blog/testing-scorm-before-client">
+  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy-deep: #0a0e27;
+      --navy-mid: #151a3d;
+      --navy-card: #1a2050;
+      --navy-border: #1e2650;
+      --teal: #00d4aa;
+      --teal-deep: #00b894;
+      --text-white: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6; min-height: 100vh;
+    }
+    body { background-attachment: fixed; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container-wide { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 24px 0; border-bottom: 1px solid var(--navy-border); }
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--text-white); text-decoration: none; letter-spacing: -0.3px; }
+    .brand span { color: var(--teal); }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--teal); }
+    .article-header { padding: 64px 0 32px; text-align: left; }
+    .eyebrow { display: inline-block; color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: 4px; margin-bottom: 20px; text-transform: uppercase; }
+    h1 { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin: 0 0 20px; }
+    .article-meta { color: var(--text-muted); font-size: 14px; margin: 0 0 8px; }
+    .article-meta a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+    .article-meta a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+    .lede { font-size: 19px; color: var(--text-muted); font-style: italic; margin: 24px 0 0; padding-left: 16px; border-left: 3px solid var(--teal); }
+    article { padding: 32px 0 64px; }
+    article h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin: 48px 0 16px; color: var(--text-white); }
+    article h2:first-of-type { margin-top: 0; }
+    article h3 { font-size: 19px; font-weight: 700; margin: 32px 0 12px; color: var(--text-white); }
+    article p { font-size: 17px; line-height: 1.7; color: var(--text-white); margin: 0 0 20px; }
+    article ul, article ol { margin: 0 0 20px; padding-left: 24px; }
+    article li { font-size: 17px; line-height: 1.7; color: var(--text-white); margin-bottom: 8px; }
+    article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(0, 212, 170, 0.4); }
+    article a:hover { border-bottom-color: var(--teal); }
+    article hr { border: none; border-top: 1px solid var(--navy-border); margin: 48px 0 32px; }
+    article code { font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; font-size: 14px; background: var(--navy-deep); border: 1px solid var(--navy-border); padding: 2px 6px; border-radius: 4px; color: var(--teal); }
+    article pre { background: var(--navy-deep); border: 1px solid var(--navy-border); border-radius: 8px; padding: 20px; overflow-x: auto; margin: 0 0 24px; }
+    article pre code { background: transparent; border: none; padding: 0; color: var(--text-white); font-size: 13px; line-height: 1.5; }
+    article blockquote { margin: 0 0 24px; padding: 16px 20px; border-left: 3px solid var(--teal); background: var(--navy-card); border-radius: 0 8px 8px 0; }
+    article blockquote p { margin: 0; color: var(--text-muted); font-style: italic; }
+    article .closing { color: var(--text-muted); font-size: 15px; font-style: italic; margin: 0; }
+    .cta-section { padding: 0 0 64px; }
+    .cta { background: linear-gradient(180deg, var(--navy-card), var(--navy-mid)); border: 1px solid var(--navy-border); border-radius: 20px; padding: 48px; text-align: center; }
+    .cta h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 12px; }
+    .cta p { color: var(--text-muted); margin: 0 0 28px; font-size: 16px; }
+    .signup-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; flex-wrap: wrap; }
+    .signup-form input[type="email"] { flex: 1; min-width: 240px; padding: 14px 18px; border-radius: 30px; border: 1px solid var(--navy-border); background: var(--navy-deep); color: var(--text-white); font-size: 15px; font-family: inherit; }
+    .signup-form input[type="email"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,212,170,0.2); }
+    .signup-form button { padding: 14px 28px; border-radius: 30px; border: none; background: var(--teal); color: var(--navy-deep); font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; transition: background 0.15s ease; }
+    .signup-form button:hover { background: var(--teal-deep); }
+    .form-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+    .hp-field { position: absolute; left: -5000px; visibility: hidden; }
+    footer { padding: 40px 0; border-top: 1px solid var(--navy-border); color: var(--text-muted); font-size: 14px; text-align: center; }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container-wide nav">
+      <a href="/" class="brand">AI Learning <span>Packager</span></a>
+      <nav class="nav-links">
+        <a href="/#what">What it does</a>
+        <a href="/#who">Who it is for</a>
+        <a href="/#blog">Blog</a>
+        <a href="/#signup">Get early access</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="article-header">
+        <div class="eyebrow">From the blog</div>
+        <h1>How to test a SCORM package before sending it to a client</h1>
+        <p class="article-meta">30 June 2026, by <a href="https://dtttech.com">Michael at Digital Technology Training</a>. About 7 minutes to read.</p>
+        <p class="lede">A practical testing routine for SCORM packages. Catches the failure that would otherwise have embarrassed you.</p>
+      </div>
+      <article>
+        <h2>Why this matters</h2>
+<p>The most expensive moment in any SCORM project is the call from the client that goes "we uploaded it and nothing works". You then spend two hours debugging on a screen-share, the client loses confidence, and the project starts smelling of trouble even if you fix it within the call.</p>
+<p>The fix is to test the package thoroughly before it leaves your machine. What follows is the four-stage testing routine I use. It takes about 30 minutes per course, and it catches roughly 95% of the issues that would otherwise surface at the client.</p>
+<h2>Stage 1: Local file system test (5 minutes)</h2>
+<p>The first test is the cheapest. Before anything else, make sure your content actually loads when extracted from the zip.</p>
+<p>Unzip your SCORM package into a folder on your desktop. Open the <code>imsmanifest.xml</code> and confirm the <code>href</code> attribute on the <code>&lt;resource&gt;</code> element matches the entry point file (almost always <code>index.html</code>).</p>
+<p>Now open that entry point file in a browser. Crucially: do not use <code>file://</code> URLs. Modern browsers block a lot of behaviour when serving from <code>file://</code>, including most ES6 modules, video autoplay, audio, and fetch requests. The result is that local file:// testing tells you almost nothing about how the content will behave when served by an LMS.</p>
+<p>Instead, serve the folder over HTTP. Three easy ways:</p>
+<ul>
+<li><strong>Python:</strong> <code>cd</code> to the folder, run <code>python3 -m http.server 8000</code>, open <code>http://localhost:8000</code> in your browser.</li>
+<li><strong>Node:</strong> <code>npx serve</code> from the folder, open the URL it prints.</li>
+<li><strong>A dedicated tool:</strong> <a href="https://greggman.github.io/servez/">Servez</a> is a free drag-and-drop HTTP server, useful on Windows.</li>
+</ul>
+<p>Click through the entire course. Does every screen render? Do all images, videos, and audio play? Are there any 404 errors in the browser console? Are there any JavaScript errors?</p>
+<p>If anything is broken at this stage, fix it before moving on. The next stages will not magically resolve it.</p>
+<h2>Stage 2: SCORM Cloud validation (10 minutes)</h2>
+<p><a href="https://cloud.scorm.com">SCORM Cloud</a> is Rustici Software's free SCORM testing platform. It is the de facto industry standard for "does my package conform to the spec?" If your package passes SCORM Cloud, you can rule out the manifest itself as a cause of any later failures.</p>
+<p>Sign up for a free account (you get a few hundred MB of free storage, plenty for testing). Upload your zip. SCORM Cloud will tell you immediately whether the manifest is valid.</p>
+<p>Then launch the course inside SCORM Cloud's test interface. Click through it as a learner would. Then exit. SCORM Cloud will show you:</p>
+<ul>
+<li>Whether <code>LMSInitialize</code> was called successfully.</li>
+<li>Whether the course set a completion status, and what that status was.</li>
+<li>Whether the course set a success status and score.</li>
+<li>A full debug log of every SCORM API call the content made.</li>
+</ul>
+<p>Three things to verify:</p>
+<p>First, the course must reach <code>LMSFinish</code> cleanly. If it does not, the LMS may not save any of the data.</p>
+<p>Second, the completion status must be what you expect (<code>completed</code> or <code>incomplete</code>). If your course is meant to mark complete on exit and SCORM Cloud shows <code>incomplete</code>, your completion logic is broken.</p>
+<p>Third, if your course is supposed to send a score, that score must appear in the debug log. If it does not, the code that calls <code>LMSSetValue("cmi.core.score.raw", ...)</code> is not firing.</p>
+<p>SCORM Cloud is strict. If something passes in SCORM Cloud, it does not guarantee it works in every LMS. If something fails in SCORM Cloud, it will definitely fail in production LMSs. So SCORM Cloud is necessary but not sufficient.</p>
+<h2>Stage 3: Test in a real LMS (10 minutes)</h2>
+<p>The third stage is the one most people skip. SCORM Cloud is a player that follows the spec strictly. Real LMSs do not. Differences between SCORM Cloud and the client's actual LMS are where most production failures live.</p>
+<p>Three options for getting a real LMS to test in:</p>
+<p><strong>Option A: Use a free tier of a major LMS.</strong> <a href="https://talentlms.com">TalentLMS</a> has a free tier (5 users, 10 courses). <a href="https://moodle.org">Moodle</a> has a free hosted instance via MoodleCloud, plus you can run it locally. <a href="https://learningmanager.adobe.com">Adobe Learning Manager</a> has a 30-day trial. Each of these gives you a real-world implementation to test against.</p>
+<p><strong>Option B: Use the demo tool.</strong> <a href="https://demo.dtttech.com">demo.dtttech.com</a> is a free demo viewer I built for showing courses to clients without LMS friction. It is not a full LMS, but it does verify that the package extracts correctly, the entry point loads, and the iframe-hosted SCORM API discovery works. Useful as a sanity check before going to a real LMS.</p>
+<p><strong>Option C: Use the client's staging environment.</strong> If the client has a staging or sandbox version of their LMS, ask for access. This is the gold standard because it tests against the exact same LMS, version, and configuration the production deploy will use. Many clients say no to this. Some say yes if you frame it as "this will reduce risk in production". Always worth asking.</p>
+<p>What to test in each LMS:</p>
+<p>Upload the package and verify it imports without error. Launch the course as a learner. Click through to the end. Exit. Then check the LMS's reporting view for that learner. Does it show the correct completion status? The correct score? The correct time?</p>
+<p>If you have access to multiple LMSs, test in at least two. The most informative pairs are TalentLMS plus Moodle, because they have very different architectures. If your package works in both, it will work in most other LMSs.</p>
+<h2>Stage 4: Edge case sweep (5 minutes)</h2>
+<p>The last stage is the one that catches the weird failures. Walk through these specific scenarios in whichever LMS you tested in:</p>
+<p><strong>Re-entry.</strong> Launch the course, partway through, exit. Then relaunch the course. Did the LMS resume you where you left off, or did it restart from the beginning? Both are valid behaviours, but you need to know which yours is so you can tell the client.</p>
+<p><strong>Interrupted exit.</strong> Launch the course, then close the browser tab without using the course's own exit button. Does the LMS still record the partial completion, or does it record nothing? This is where the <code>unload</code> event handler in your content really gets tested.</p>
+<p><strong>Multiple browser sessions.</strong> Some LMSs allow learners to have the course open in two tabs simultaneously. If that happens, do the SCORM API calls clash? Does one tab overwrite the other's progress? Usually not a problem for a single learner, but worth verifying.</p>
+<p><strong>Browser console while running.</strong> Launch the course, open DevTools, and watch the console as you click through. Any errors? Any warnings? Even if the course "works", silent errors are usually a sign of fragile code that will break on a different browser or LMS version.</p>
+<p><strong>Mobile.</strong> If the client's learners might launch on mobile, test on mobile. Tap targets, viewport scaling, audio playback, and orientation handling all behave differently from desktop.</p>
+<h2>The handoff</h2>
+<p>Once the package has passed all four stages, you can hand it off with confidence. I include three things in the handoff:</p>
+<p>A short test report. Just a few lines: "Tested in SCORM Cloud, TalentLMS, and the demo viewer. Completion tracking confirmed. No errors in browser console. Re-entry resumes from last screen." Clients appreciate this and it sets you up well if anything does go wrong.</p>
+<p>The exact LMSs and browsers tested in. So that if a problem appears on an untested combination, there is a starting point for diagnosis.</p>
+<p>A request: ask the client to test the package in their LMS as soon as it arrives, before publishing to their learners. This is the most important step because it catches LMS-specific issues while the project is still active rather than after launch.</p>
+<h2>Where the packager fits</h2>
+<p>The <a href="https://packager.dtttech.com">AI Learning Packager</a> generates packages that pass Stage 2 (SCORM Cloud validation) out of the box. The other three stages are still on you, because they test the content rather than the wrapping. But starting from a clean, valid package removes the biggest source of false positives, which means the failures you do find in Stages 1, 3, and 4 are almost always real content issues you can fix.</p>
+<hr />
+<p><em>Built by Michael at <a href="https://dtttech.com">Digital Technology Training</a>. <a href="https://packager.dtttech.com">The packager</a> is in private beta. Request access below.</em></p>
+      </article>
+    </div>
+    <div class="container-wide cta-section">
+      <div class="cta">
+        <h2>Try the packager</h2>
+        <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds. Free for early testers.</p>
+        <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thanks.html" class="signup-form">
+          <input type="hidden" name="form-name" value="early-access">
+          <p class="hp-field"><label>Do not fill this out if you are human: <input name="bot-field"></label></p>
+          <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
+          <button type="submit">Request access</button>
+        </form>
+        <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container-wide">
+      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+    </div>
+  </footer>
+</body>
+</html>
