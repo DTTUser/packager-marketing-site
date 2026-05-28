@@ -279,6 +279,51 @@
       font-size: 15px;
     }
 
+    /* Blog teaser */
+    .blog-card {
+      background: var(--navy-card);
+      border: 1px solid var(--navy-border);
+      border-radius: 12px;
+      padding: 28px;
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .blog-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+    }
+
+    .blog-card .blog-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 0 0 8px;
+    }
+
+    .blog-card h3 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin: 0 0 8px;
+      color: var(--text-white);
+    }
+
+    .blog-card p {
+      margin: 0 0 16px;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .blog-card .read-more {
+      font-size: 14px;
+      color: var(--teal);
+      font-weight: 700;
+    }
+
     /* CTA / form */
     .cta {
       background: linear-gradient(180deg, var(--navy-card), var(--navy-mid));
@@ -382,6 +427,7 @@
       <nav class="nav-links">
         <a href="#what">What it does</a>
         <a href="#who">Who it is for</a>
+        <a href="#blog">Blog</a>
         <a href="#signup">Get early access</a>
       </nav>
     </div>
@@ -477,6 +523,20 @@
             <p>You have content in formats your LMS does not accept, and you need a fast, predictable way to wrap it.</p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section id="blog">
+      <div class="container">
+        <h2>From the blog</h2>
+        <p class="section-lede">Practical notes on SCORM, LMSs, and the gap between AI-generated content and the systems that have to host it.</p>
+
+        <a href="/blog/what-scorm-actually-tracks.html" class="blog-card">
+          <p class="blog-meta">28 May 2026, 6 minute read</p>
+          <h3>What SCORM actually tracks</h3>
+          <p>A short, practical guide to the five things SCORM 1.2 records, the things it does not, and why the difference matters for course design.</p>
+          <span class="read-more">Read post &rarr;</span>
+        </a>
       </div>
     </section>
 

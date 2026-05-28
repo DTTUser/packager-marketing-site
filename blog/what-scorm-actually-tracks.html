@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What SCORM actually tracks, AI Learning Packager</title>
+  <meta name="description" content="A short, practical guide to what SCORM 1.2 records, what it does not, and why the difference matters for course design.">
+
+  <meta property="og:title" content="What SCORM actually tracks">
+  <meta property="og:description" content="A short, practical guide for anyone who has ever sworn at an LMS upload screen.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://packager.dtttech.com/blog/what-scorm-actually-tracks">
+  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy-deep: #0a0e27;
+      --navy-mid: #151a3d;
+      --navy-card: #1a2050;
+      --navy-border: #1e2650;
+      --teal: #00d4aa;
+      --teal-deep: #00b894;
+      --text-white: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    body { background-attachment: fixed; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .container-wide {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--navy-border);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text-white);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .brand span { color: var(--teal); }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .nav-links a:hover { color: var(--teal); }
+
+    /* Article header */
+    .article-header {
+      padding: 64px 0 32px;
+      text-align: left;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin: 0 0 20px;
+    }
+
+    .article-meta {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 0 0 8px;
+    }
+
+    .article-meta a {
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--text-muted);
+    }
+
+    .article-meta a:hover {
+      color: var(--teal);
+      border-bottom-color: var(--teal);
+    }
+
+    .lede {
+      font-size: 19px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin: 24px 0 0;
+      padding-left: 16px;
+      border-left: 3px solid var(--teal);
+    }
+
+    /* Article body */
+    article {
+      padding: 32px 0 64px;
+    }
+
+    article h2 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      margin: 48px 0 16px;
+      color: var(--text-white);
+    }
+
+    article h2:first-of-type {
+      margin-top: 0;
+    }
+
+    article p {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-white);
+      margin: 0 0 20px;
+    }
+
+    article p:has(+ h2) {
+      margin-bottom: 8px;
+    }
+
+    article a {
+      color: var(--teal);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0, 212, 170, 0.4);
+    }
+
+    article a:hover {
+      border-bottom-color: var(--teal);
+    }
+
+    article hr {
+      border: none;
+      border-top: 1px solid var(--navy-border);
+      margin: 48px 0 32px;
+    }
+
+    article .closing {
+      color: var(--text-muted);
+      font-size: 15px;
+      font-style: italic;
+      margin: 0;
+    }
+
+    /* CTA / form */
+    .cta-section {
+      padding: 0 0 64px;
+    }
+
+    .cta {
+      background: linear-gradient(180deg, var(--navy-card), var(--navy-mid));
+      border: 1px solid var(--navy-border);
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+    }
+
+    .cta h2 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0 0 12px;
+    }
+
+    .cta p {
+      color: var(--text-muted);
+      margin: 0 0 28px;
+      font-size: 16px;
+    }
+
+    .signup-form {
+      display: flex;
+      gap: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .signup-form input[type="email"] {
+      flex: 1;
+      min-width: 240px;
+      padding: 14px 18px;
+      border-radius: 30px;
+      border: 1px solid var(--navy-border);
+      background: var(--navy-deep);
+      color: var(--text-white);
+      font-size: 15px;
+      font-family: inherit;
+    }
+
+    .signup-form input[type="email"]:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0,212,170,0.2);
+    }
+
+    .signup-form button {
+      padding: 14px 28px;
+      border-radius: 30px;
+      border: none;
+      background: var(--teal);
+      color: var(--navy-deep);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s ease;
+    }
+
+    .signup-form button:hover {
+      background: var(--teal-deep);
+    }
+
+    .form-note {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+
+    .hp-field {
+      position: absolute;
+      left: -5000px;
+      visibility: hidden;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--navy-border);
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container-wide nav">
+      <a href="/" class="brand">AI Learning <span>Packager</span></a>
+      <nav class="nav-links">
+        <a href="/#what">What it does</a>
+        <a href="/#who">Who it is for</a>
+        <a href="/#signup">Get early access</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="article-header">
+        <div class="eyebrow">From the blog</div>
+        <h1>What SCORM actually tracks</h1>
+        <p class="article-meta">28 May 2026, by <a href="https://dtttech.com">Michael at Digital Technology Training</a>. About 6 minutes to read.</p>
+        <p class="lede">A short, practical guide for anyone who has ever sworn at an LMS upload screen.</p>
+      </div>
+
+      <article>
+        <p>Most people who deal with SCORM have a vague sense of what it does. The LMS asks for a SCORM file, you give it a SCORM file, the LMS goes "thanks", and at some point a tick appears next to the learner's name. Job done.</p>
+
+        <p>That sketch is enough to get through the day. It is not enough to design good courses, debug a failing upload, or have a useful conversation with an LMS administrator. So here is what SCORM actually tracks, what it does not, and why the difference matters.</p>
+
+        <h2>The short version</h2>
+
+        <p>SCORM 1.2, which is what most LMSs still run on in 2026, tracks five things.</p>
+
+        <p>First, completion status. Did the learner finish or not? This is a yes or no flag, not a percentage. There is a separate "incomplete" state for someone halfway through, and a "not attempted" state for someone who has not started yet, but the headline question is binary.</p>
+
+        <p>Second, success status. Did the learner pass or fail? Again binary. A course can be "completed" but "failed", which trips up a lot of people. The learner can finish all the screens and still bomb the quiz.</p>
+
+        <p>Third, score. A number between 0 and 100, plus optional minimum and maximum bounds. The LMS will display this on the learner's transcript if you tell it to. Many courses never bother to send one, which is fine if the course is informational.</p>
+
+        <p>Fourth, time. How long the learner had the course open. Note: open, not engaged. The course has no way to know whether they were reading, eating a sandwich, or asleep.</p>
+
+        <p>Fifth, interactions. If your course is set up to send them, SCORM will record individual question results: which question, what they answered, whether it was right, how long they took. This is the most useful data, and it is also the most commonly missing because most authoring tools either do not send it or hide it behind a setting nobody finds.</p>
+
+        <p>That is the whole list. Anything else you have ever seen in an LMS dashboard is built on top of those five primitives.</p>
+
+        <h2>What SCORM does not track</h2>
+
+        <p>This is where people get caught out.</p>
+
+        <p>It does not track which screen the learner is on. You can rebuild this from the interactions log if your content sends one per screen, but the base spec has no concept of "page 4 of 12".</p>
+
+        <p>It does not track video plays, clicks, hovers, drag-and-drop attempts, or any of the rich interaction data that modern web analytics tools take for granted. If you want that, you need xAPI, which is the spiritual successor to SCORM and is a whole separate conversation.</p>
+
+        <p>It does not track learner behaviour across multiple courses. Each SCORM session is self-contained. The LMS may roll up data across courses for reporting, but the course itself only knows about itself.</p>
+
+        <p>It does not track engagement quality. There is no "did this resonate" field. The closest you get is time on screen, which as already noted, is a lousy proxy.</p>
+
+        <p>It does not enforce sequencing in any sophisticated way. SCORM 2004 added more sequencing logic, but almost nobody uses it because it is fiddly and most LMSs implement it inconsistently.</p>
+
+        <h2>Why this matters for course design</h2>
+
+        <p>A few practical consequences.</p>
+
+        <p>If your course is informational and there is no quiz, you only need to send "completed". The simplest possible SCORM call. Most authoring tools do this automatically.</p>
+
+        <p>If you want a pass or fail flag, you need a quiz somewhere, and your code has to send a score and a success status. Worth checking what your authoring tool sends by default, because some send pass or fail based on quiz score and others ignore the quiz entirely.</p>
+
+        <p>If you want per-question reporting in the LMS, your quiz code has to send an interaction record per question. Storyline does this, iSpring does this, Captivate does this. Hand-coded HTML quizzes usually do not unless someone went to the trouble of wiring up the SCORM API.</p>
+
+        <p>If your LMS is showing weird results (a 100% score but "failed", or "completed" with no score), the issue is almost always that the course code is sending an inconsistent mix of values. The LMS is just displaying what it was told.</p>
+
+        <h2>Why the wrapper matters</h2>
+
+        <p>This is why the AI Learning Packager exists. Most modern HTML learning content does not call the SCORM API at all. It is just web content. Drop it into an LMS as a zip and the LMS has no idea what to do with it.</p>
+
+        <p>The wrapper adds the bare minimum: an imsmanifest file so the LMS knows what it is looking at, a SCORM API wrapper script so the content can call out to the LMS, and a simple "mark complete on exit" call so the LMS gets at least one signal back. The original HTML is untouched.</p>
+
+        <p>If you want more than completion tracking, your HTML has to do the work. The wrapper exposes the SCORM API to the page. From there, your code can send a score, a pass or fail, interactions, anything the spec supports. Most courses will not need this. The ones that do, can.</p>
+
+        <h2>When SCORM is the wrong tool</h2>
+
+        <p>SCORM is a 2001 specification. It was designed when learning content was a CD-ROM. It has the strengths and the limits you would expect from that era.</p>
+
+        <p>If you are building something that needs detailed behaviour analytics, multi-session memory, mobile-native interaction, or anything resembling modern web app data flows, SCORM is the wrong tool. Look at xAPI (also called Tin Can), or at custom backend integration.</p>
+
+        <p>If you are building a course that needs to drop into an existing LMS, get marked complete, optionally show a score, and not require IT involvement, SCORM is the right tool, and probably will be for another decade. There is too much infrastructure built on it for the industry to move on.</p>
+
+        <h2>In summary</h2>
+
+        <p>SCORM tracks completion, success, score, time, and optional interactions. That is the whole feature set. Anything fancier than that, you either build on top of it or use a different standard.</p>
+
+        <p>If that sounds like a smaller surface area than the LMS dashboards suggest, that is because most of the dashboards are doing the dressing up. The underlying data is simpler than it looks.</p>
+
+        <hr>
+
+        <p class="closing">Built by Michael at <a href="https://dtttech.com">Digital Technology Training</a>. The AI Learning Packager is in private beta. If you want to try wrapping HTML content into a SCORM 1.2 package without touching an authoring tool, request access below.</p>
+      </article>
+    </div>
+
+    <div class="container-wide cta-section">
+      <div class="cta">
+        <h2>Try the packager</h2>
+        <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds. Free for early testers.</p>
+
+        <form
+          name="early-access"
+          method="POST"
+          data-netlify="true"
+          data-netlify-honeypot="bot-field"
+          action="/thanks.html"
+          class="signup-form"
+        >
+          <input type="hidden" name="form-name" value="early-access">
+          <p class="hp-field">
+            <label>Do not fill this out if you are human: <input name="bot-field"></label>
+          </p>
+          <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
+          <button type="submit">Request access</button>
+        </form>
+        <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container-wide">
+      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
