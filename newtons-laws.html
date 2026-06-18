@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Newton's Three Laws of Motion</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161d2a;
+    --surface2: #1e2736;
+    --accent:   #00e5a0;
+    --amber:    #f5a623;
+    --text:     #ffffff;
+    --muted:    #a0aab8;
+    --radius:   12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Progress bar ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .intro {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin: 0 auto 0.5rem;
+  }
+
+  /* ── Nav dots ── */
+  .nav-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 1.5rem 0;
+  }
+
+  .nav-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--surface2);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .nav-dot.active { background: var(--accent); border-color: var(--accent); }
+  .nav-dot.done   { background: transparent; border-color: var(--accent); }
+
+  /* ── Slides ── */
+  main { max-width: 760px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+  .slide { display: none; animation: fadeIn 0.35s ease; }
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Law card ── */
+  .law-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--accent);
+  }
+
+  .law-number {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .law-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .law-formal {
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--muted);
+    border-left: 2px solid var(--amber);
+    padding-left: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .law-plain {
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Example strip ── */
+  .examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .example-card {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .example-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .example-card .icon { font-size: 2rem; margin-bottom: 0.4rem; display: block; }
+  .example-card .label { font-size: 0.85rem; color: var(--muted); }
+  .example-card .detail {
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: 0.5rem;
+    min-height: 1.2em;
+    display: none;
+  }
+  .example-card.revealed .detail { display: block; }
+  .example-card.revealed { border-color: var(--accent); }
+
+  .tap-hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+
+  /* ── Demo: interactive visual ── */
+  .demo-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .demo-box h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--accent);
+  }
+
+  /* Law 1 demo: puck */
+  #puck-track {
+    position: relative;
+    height: 80px;
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  #puck {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px; height: 48px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 0 16px rgba(0,229,160,0.4);
+  }
+
+
+  .demo-controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  /* Law 2 demo: force/mass/accel */
+  .fma-sliders { display: grid; gap: 1rem; margin-bottom: 1rem; }
+
+  .slider-row label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .slider-row label span { color: var(--text); font-weight: 600; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface2);
+    outline: none;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .accel-display {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .accel-display span { color: var(--accent); }
+
+  /* Law 3 demo: rocket */
+  #rocket-track {
+    position: relative;
+    height: 80px;
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+
+  #rocket {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px; height: 24px;
+    opacity: 1;
+  }
+  /* CSS rocket shape: body + nose pointing left */
+  #rocket::before {
+    content: '';
+    position: absolute;
+    right: 0; top: 0;
+    width: 36px; height: 24px;
+    background: var(--accent);
+    border-radius: 4px 2px 2px 4px;
+  }
+  #rocket::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 16px solid var(--accent);
+  }
+
+  #exhaust {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; height: 10px;
+    opacity: 0;
+  }
+  #exhaust::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 20px solid #f5a623;
+  }
+
+
+  /* ── Activity / quiz ── */
+  .quiz-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .quiz-card h3 {
+    font-size: 1rem;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+  }
+
+  .q-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+  }
+
+  .options { display: grid; gap: 0.6rem; }
+
+  .option {
+    background: var(--surface2);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: left;
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+  }
+
+  .option:hover:not(:disabled) { border-color: var(--accent); }
+  .option.correct  { border-color: var(--accent); background: rgba(0,229,160,0.1); }
+  .option.wrong    { border-color: #e05555; background: rgba(224,85,85,0.1); }
+  .option:disabled { cursor: default; }
+
+  .feedback {
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+    min-height: 1.4em;
+    color: var(--muted);
+  }
+  .feedback.ok  { color: var(--accent); }
+  .feedback.bad { color: #e05555; }
+
+  /* ── Score screen ── */
+  #score-screen {
+    text-align: center;
+    padding: 3rem 1rem;
+  }
+
+  .score-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 4px solid var(--accent);
+    margin: 0 auto 1.5rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem;
+    font-weight: 800;
+    box-shadow: 0 0 40px rgba(0,229,160,0.25);
+  }
+
+  #score-msg { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem; }
+  #score-sub { color: var(--muted); margin-bottom: 2rem; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 2px solid var(--surface2);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ── Nav bar ── */
+  .slide-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    gap: 1rem;
+  }
+
+  .slide-counter { color: var(--muted); font-size: 0.85rem; }
+
+  /* ── Responsive ── */
+  @media (max-width: 480px) {
+    header { padding: 2.5rem 1rem 1rem; }
+    .law-card, .demo-box, .quiz-card { padding: 1.25rem; }
+    .examples { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header>
+  <p class="eyebrow">Physics · Forces &amp; Motion</p>
+  <h1>Newton's <span>Three Laws</span><br>of Motion</h1>
+  <p class="intro">Three rules that explain almost everything that moves -- from a football to a spacecraft.</p>
+</header>
+
+<div class="nav-dots" id="nav-dots"></div>
+
+<main>
+
+  <!-- ══ SLIDE 0: Law 1 ══ -->
+  <section class="slide active" id="slide-0">
+    <div class="law-card">
+      <p class="law-number">Law 1 &mdash; Inertia</p>
+      <h2 class="law-title">Objects keep doing what they're doing.</h2>
+      <p class="law-formal">"An object at rest stays at rest, and an object in motion stays in motion at the same speed and in the same direction, unless acted on by an unbalanced force."</p>
+      <p class="law-plain">
+        In plain terms: things are lazy. A football sitting on the pitch won't move until you kick it. And once it's moving, it'd carry on forever -- if friction and air resistance didn't slow it down.
+        <br><br>
+        That resistance to change is called <strong>inertia</strong>. Heavier objects have more of it -- which is why it's harder to push a car than a trolley.
+      </p>
+    </div>
+
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;">Tap each example to see Law 1 in action.</p>
+    <div class="examples">
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">⚽</span>
+        <div class="label">Football on grass</div>
+        <div class="detail">Friction is the unbalanced force that stops it.</div>
+      </div>
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🛷</span>
+        <div class="label">Sledge on ice</div>
+        <div class="detail">Low friction = slides much further before stopping.</div>
+      </div>
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🚗</span>
+        <div class="label">Emergency stop</div>
+        <div class="detail">Your body keeps moving forward -- hence seatbelts.</div>
+      </div>
+    </div>
+
+    <div class="demo-box" style="margin-top:1.25rem;">
+      <h3>&#9654; Try it: Space puck</h3>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:1rem;">In deep space there's no friction. Hit the puck and watch what happens.</p>
+      <div id="puck-track"><div id="puck">🏒</div></div>
+      <div class="demo-controls">
+        <button class="btn" onclick="launchPuck()">Hit the puck</button>
+        <button class="btn-ghost" onclick="resetPuck()">Reset</button>
+      </div>
+      <p id="puck-note" style="margin-top:0.75rem;font-size:0.85rem;color:var(--muted);min-height:1.2em;"></p>
+    </div>
+
+    <div class="slide-nav">
+      <span class="slide-counter">1 of 5</span>
+      <button class="btn" onclick="goTo(1)">Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 1: Law 2 ══ -->
+  <section class="slide" id="slide-1">
+    <div class="law-card">
+      <p class="law-number">Law 2 &mdash; Force, Mass &amp; Acceleration</p>
+      <h2 class="law-title">More force = more acceleration. More mass = less.</h2>
+      <p class="law-formal">"The acceleration of an object depends on the net force acting on it and its mass: F = ma."</p>
+      <p class="law-plain">
+        The harder you push something, the faster it accelerates. But heavier objects accelerate less for the same push.
+        <br><br>
+        Written as a formula: <strong>F = m &times; a</strong> &nbsp;(Force = mass &times; acceleration).
+        Rearranged: <strong>a = F &divide; m</strong> -- so doubling the mass halves the acceleration if the force stays the same.
+      </p>
+    </div>
+
+    <div class="demo-box">
+      <h3>&#9654; Try it: F = ma calculator</h3>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:1rem;">Drag the sliders and watch acceleration update in real time.</p>
+      <div class="fma-sliders">
+        <div class="slider-row">
+          <label>Force (N) <span id="force-val">10</span></label>
+          <input type="range" id="force-slider" min="1" max="100" value="10" oninput="updateFMA()">
+        </div>
+        <div class="slider-row">
+          <label>Mass (kg) <span id="mass-val">5</span></label>
+          <input type="range" id="mass-slider" min="1" max="50" value="5" oninput="updateFMA()">
+        </div>
+      </div>
+      <div class="accel-display">
+        Acceleration: <span id="accel-out">2.00</span> m/s²
+      </div>
+    </div>
+
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;">Tap each example to reveal how Law 2 applies.</p>
+    <div class="examples">
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🏎️</span>
+        <div class="label">Racing car</div>
+        <div class="detail">High force + low mass = massive acceleration.</div>
+      </div>
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🚛</span>
+        <div class="label">Loaded lorry</div>
+        <div class="detail">Same engine force, far more mass -- much slower to speed up.</div>
+      </div>
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🎳</span>
+        <div class="label">Bowling ball vs pin</div>
+        <div class="detail">Same force hits both. Lighter pin flies; heavy ball barely slows.</div>
+      </div>
+    </div>
+
+    <div class="slide-nav">
+      <button class="btn-ghost" onclick="goTo(0)">&larr; Back</button>
+      <span class="slide-counter">2 of 5</span>
+      <button class="btn" onclick="goTo(2)">Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 2: Law 3 ══ -->
+  <section class="slide" id="slide-2">
+    <div class="law-card">
+      <p class="law-number">Law 3 &mdash; Action &amp; Reaction</p>
+      <h2 class="law-title">Every action has an equal and opposite reaction.</h2>
+      <p class="law-formal">"For every action there is an equal and opposite reaction."</p>
+      <p class="law-plain">
+        Forces always come in pairs. When you push on something, it pushes back on you with the same force -- just in the opposite direction.
+        <br><br>
+        Jump off a skateboard and the board shoots backwards. A rocket burns fuel downwards, and the rocket shoots upwards. You push the ground down when you walk; the ground pushes you forward.
+      </p>
+    </div>
+
+    <div class="demo-box">
+      <h3>&#9654; Try it: Rocket launch</h3>
+      <p style="font-size:0.9rem;color:var(--muted);margin-bottom:1rem;">The exhaust gases go one way -- the rocket goes the other.</p>
+      <div id="rocket-track">
+        <div id="rocket"></div>
+        <div id="exhaust"></div>
+      </div>
+      <div class="demo-controls">
+        <button class="btn" onclick="launchRocket()">Launch</button>
+        <button class="btn-ghost" onclick="resetRocket()">Reset</button>
+      </div>
+    </div>
+
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;">Tap each example to see Law 3 in action.</p>
+    <div class="examples">
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🛹</span>
+        <div class="label">Skateboard jump</div>
+        <div class="detail">You push back on the board; the board pushes you forward.</div>
+      </div>
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🔫</span>
+        <div class="label">Gun recoil</div>
+        <div class="detail">Bullet goes forward; equal force pushes the gun backward.</div>
+      </div>
+      <div class="example-card" onclick="reveal(this)">
+        <span class="icon">🏊</span>
+        <div class="label">Swimming</div>
+        <div class="detail">You push water backward; water pushes you forward.</div>
+      </div>
+    </div>
+
+    <div class="slide-nav">
+      <button class="btn-ghost" onclick="goTo(1)">&larr; Back</button>
+      <span class="slide-counter">3 of 5</span>
+      <button class="btn" onclick="goTo(3)">Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 3: Activity ══ -->
+  <section class="slide" id="slide-3">
+
+    <div style="margin-bottom:1.5rem;">
+      <p class="eyebrow">Quick Check</p>
+      <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:0.25rem;">Which law is it?</h2>
+      <p style="color:var(--muted);font-size:0.95rem;">Four scenarios. Pick the right law for each.</p>
+    </div>
+
+    <!-- Q1 -->
+    <div class="quiz-card" id="q1">
+      <h3>Question 1 of 4</h3>
+      <p class="q-text">A astronaut throws a wrench in deep space. The wrench keeps travelling in a straight line forever. Which law explains this?</p>
+      <div class="options">
+        <button class="option" onclick="answer(this,'q1',false)">Law 2 -- F = ma</button>
+        <button class="option" onclick="answer(this,'q1',true)">Law 1 -- Inertia</button>
+        <button class="option" onclick="answer(this,'q1',false)">Law 3 -- Action &amp; Reaction</button>
+      </div>
+      <p class="feedback" id="fb-q1"></p>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-card" id="q2">
+      <h3>Question 2 of 4</h3>
+      <p class="q-text">A small car and a large lorry have the same engine force applied. The car accelerates much faster. Which law explains this?</p>
+      <div class="options">
+        <button class="option" onclick="answer(this,'q2',false)">Law 1 -- Inertia</button>
+        <button class="option" onclick="answer(this,'q2',false)">Law 3 -- Action &amp; Reaction</button>
+        <button class="option" onclick="answer(this,'q2',true)">Law 2 -- F = ma</button>
+      </div>
+      <p class="feedback" id="fb-q2"></p>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-card" id="q3">
+      <h3>Question 3 of 4</h3>
+      <p class="q-text">When you fire a water pistol, the pistol jerks back in your hand. Which law explains the backward kick?</p>
+      <div class="options">
+        <button class="option" onclick="answer(this,'q3',false)">Law 2 -- F = ma</button>
+        <button class="option" onclick="answer(this,'q3',true)">Law 3 -- Action &amp; Reaction</button>
+        <button class="option" onclick="answer(this,'q3',false)">Law 1 -- Inertia</button>
+      </div>
+      <p class="feedback" id="fb-q3"></p>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-card" id="q4">
+      <h3>Question 4 of 4</h3>
+      <p class="q-text">A puck slides across an ice rink and gradually slows down. Friction is the unbalanced force acting on it. Which law covers this?</p>
+      <div class="options">
+        <button class="option" onclick="answer(this,'q4',false)">Law 3 -- Action &amp; Reaction</button>
+        <button class="option" onclick="answer(this,'q4',false)">Law 2 -- F = ma</button>
+        <button class="option" onclick="answer(this,'q4',true)">Law 1 -- Inertia</button>
+      </div>
+      <p class="feedback" id="fb-q4"></p>
+    </div>
+
+    <div class="slide-nav">
+      <button class="btn-ghost" onclick="goTo(2)">&larr; Back</button>
+      <span class="slide-counter">4 of 5</span>
+      <button class="btn" id="finish-btn" onclick="showScore()" disabled style="opacity:0.4;cursor:default;">See results &rarr;</button>
+    </div>
+  </section>
+
+  <!-- ══ SLIDE 4: Score ══ -->
+  <section class="slide" id="slide-4">
+    <div id="score-screen">
+      <div class="score-circle" id="score-circle">0/4</div>
+      <p id="score-msg"></p>
+      <p id="score-sub"></p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-ghost" onclick="retake()">Try again</button>
+        <button class="btn" onclick="goTo(0)">Review laws &rarr;</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--surface2);">
+      <p style="font-size:0.75rem;color:var(--muted);">Built by <strong style="color:var(--accent);">DTTtech.com</strong></p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ── State ──
+  const TOTAL_SLIDES = 5;
+  let currentSlide = 0;
+  const scores = { q1: null, q2: null, q3: null, q4: null };
+  const QUIZZES = ['q1','q2','q3','q4'];
+
+  // ── Navigation ──
+  function buildDots() {
+    const container = document.getElementById('nav-dots');
+    for (let i = 0; i < TOTAL_SLIDES; i++) {
+      const d = document.createElement('button');
+      d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      d.onclick = () => goTo(i);
+      container.appendChild(d);
+    }
+  }
+
+  function goTo(n) {
+    document.getElementById('slide-' + currentSlide).classList.remove('active');
+    currentSlide = n;
+    document.getElementById('slide-' + n).classList.add('active');
+    updateDots();
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateDots() {
+    const dots = document.querySelectorAll('.nav-dot');
+    dots.forEach((d, i) => {
+      d.className = 'nav-dot';
+      if (i === currentSlide) d.classList.add('active');
+      else if (i < currentSlide) d.classList.add('done');
+    });
+  }
+
+  function updateProgress() {
+    const pct = ((currentSlide) / (TOTAL_SLIDES - 1)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  // ── Example reveal ──
+  function reveal(el) {
+    el.classList.toggle('revealed');
+  }
+
+  // ── Law 1 demo: puck ──
+  let puckMoving = false;
+  let puckRAF = null;
+  let puckPos = 10; // percent
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('puck').style.left = '10%';
+    document.getElementById('rocket').style.right = '10%';
+    document.getElementById('exhaust').style.right = '22%';
+  });
+
+  function launchPuck() {
+    if (puckMoving) return;
+    puckMoving = true;
+    document.getElementById('puck-note').textContent = 'No friction out here -- it\'ll keep going forever.';
+    const puck = document.getElementById('puck');
+    const duration = 1800;
+    const start = performance.now();
+    const from = puckPos;
+    const to = 85;
+
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      puckPos = from + (to - from) * t;
+      puck.style.left = puckPos + '%';
+      if (t < 1) puckRAF = requestAnimationFrame(step);
+    }
+    puckRAF = requestAnimationFrame(step);
+  }
+
+  function resetPuck() {
+    if (puckRAF) { cancelAnimationFrame(puckRAF); puckRAF = null; }
+    puckPos = 10;
+    puckMoving = false;
+    const puck = document.getElementById('puck');
+    puck.style.left = '10%';
+    document.getElementById('puck-note').textContent = '';
+  }
+
+  // ── Law 2 demo: F = ma ──
+  function updateFMA() {
+    const f = parseFloat(document.getElementById('force-slider').value);
+    const m = parseFloat(document.getElementById('mass-slider').value);
+    document.getElementById('force-val').textContent = f;
+    document.getElementById('mass-val').textContent = m;
+    document.getElementById('accel-out').textContent = (f / m).toFixed(2);
+  }
+
+  // ── Law 3 demo: rocket ──
+  let rocketLaunched = false;
+  let rocketRAF = null;
+  let rocketPos = 10; // percent from right
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function launchRocket() {
+    if (rocketLaunched) return;
+    rocketLaunched = true;
+    const r = document.getElementById('rocket');
+    const e = document.getElementById('exhaust');
+    e.style.opacity = '1';
+    const duration = 1400;
+    const start = performance.now();
+    const from = rocketPos;
+    const to = 80;
+
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      rocketPos = from + (to - from) * easeOut(t);
+      r.style.right = rocketPos + '%';
+      // exhaust trails behind (to the right of) the rocket
+      e.style.right = Math.max(rocketPos - 12, 2) + '%';
+      if (t < 1) rocketRAF = requestAnimationFrame(step);
+    }
+    rocketRAF = requestAnimationFrame(step);
+  }
+
+  function resetRocket() {
+    if (rocketRAF) { cancelAnimationFrame(rocketRAF); rocketRAF = null; }
+    rocketPos = 10;
+    rocketLaunched = false;
+    const r = document.getElementById('rocket');
+    const e = document.getElementById('exhaust');
+    r.style.right = '10%';
+    e.style.right = '10%';
+    e.style.opacity = '0';
+  }
+
+  // ── Quiz ──
+  const FEEDBACK = {
+    q1: { ok: 'Correct. No force acting = no change in motion. Law 1.', bad: 'Not quite. Nothing is pushing or stopping the wrench, so it just keeps going. That\'s Law 1.' },
+    q2: { ok: 'Correct. Same force, different mass = different acceleration. F = ma.', bad: 'Not quite. The key here is mass affecting acceleration for the same force. That\'s Law 2.' },
+    q3: { ok: 'Correct. The water goes forward, the pistol pushes back. Equal and opposite.', bad: 'Not quite. The pistol kicks back because water pushes forward with equal force the other way. Law 3.' },
+    q4: { ok: 'Correct. Friction is the unbalanced force changing the puck\'s motion. Law 1.', bad: 'Not quite. The puck would carry on forever without friction -- it\'s the unbalanced force that changes things. Law 1.' },
+  };
+
+  function answer(btn, qid, correct) {
+    const card = document.getElementById(qid);
+    const fb   = document.getElementById('fb-' + qid);
+    const opts = card.querySelectorAll('.option');
+
+    opts.forEach(o => o.disabled = true);
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    fb.textContent = correct ? FEEDBACK[qid].ok : FEEDBACK[qid].bad;
+    fb.className   = 'feedback ' + (correct ? 'ok' : 'bad');
+
+    scores[qid] = correct;
+    checkAllAnswered();
+  }
+
+  function checkAllAnswered() {
+    const done = QUIZZES.every(q => scores[q] !== null);
+    if (done) {
+      const btn = document.getElementById('finish-btn');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    }
+  }
+
+  function showScore() {
+    const total = QUIZZES.filter(q => scores[q]).length;
+    goTo(4);
+    document.getElementById('score-circle').textContent = total + '/4';
+
+    let msg, sub;
+    if (total === 4) {
+      msg = 'Full marks. Newton would approve.';
+      sub = 'You\'ve got all three laws nailed.';
+    } else if (total >= 2) {
+      msg = 'Solid effort -- most of it\'s clicked.';
+      sub = 'Review the ones you missed, then try again.';
+    } else {
+      msg = 'Worth another pass through the laws.';
+      sub = 'Head back, re-read the examples, then have another go.';
+    }
+    document.getElementById('score-msg').textContent = msg;
+    document.getElementById('score-sub').textContent = sub;
+    document.getElementById('progress-bar').style.width = '100%';
+  }
+
+  function retake() {
+    QUIZZES.forEach(q => {
+      scores[q] = null;
+      const card = document.getElementById(q);
+      card.querySelectorAll('.option').forEach(o => {
+        o.disabled = false;
+        o.classList.remove('correct', 'wrong');
+      });
+      document.getElementById('fb-' + q).textContent = '';
+      document.getElementById('fb-' + q).className = 'feedback';
+    });
+    const btn = document.getElementById('finish-btn');
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'default';
+    goTo(3);
+  }
+
+  // ── Init ──
+  buildDots();
+  updateProgress();
+</script>
+</body>
+</html>
