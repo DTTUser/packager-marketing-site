@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Briefing | A Critical Thinking Simulation</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161d2a;
+    --surface2:  #1e2736;
+    --accent:    #00e5a0;
+    --amber:     #f5a623;
+    --danger:    #e05555;
+    --text:      #ffffff;
+    --muted:     #a0aab8;
+    --radius:    12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Progress bar ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.5s ease;
+    z-index: 100;
+  }
+
+  /* ── Bias meter ── */
+  #bias-bar-wrap {
+    position: fixed;
+    top: 3px; left: 0; right: 0;
+    background: var(--surface);
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 99;
+    border-bottom: 1px solid var(--surface2);
+  }
+
+  #bias-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  #bias-track {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  #bias-fill {
+    height: 100%;
+    width: 50%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.6s ease, background 0.6s ease;
+  }
+
+  #bias-score-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  /* ── Main layout ── */
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem 4rem;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.4s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Intro ── */
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .intro-body {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 540px;
+    margin-bottom: 2rem;
+  }
+
+  .scenario-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    border-left: 4px solid var(--amber);
+    margin-bottom: 2rem;
+  }
+
+  .scenario-card .tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.5rem;
+  }
+
+  .scenario-card p {
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ── Document / evidence card ── */
+  .doc-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .doc-card .doc-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--surface2);
+  }
+
+  .doc-icon {
+    width: 40px; height: 40px;
+    background: var(--surface2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .doc-meta { flex: 1; }
+  .doc-meta .doc-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.2rem; }
+  .doc-meta .doc-source { font-size: 0.8rem; color: var(--muted); }
+
+  .doc-body { font-size: 0.95rem; color: var(--text); line-height: 1.7; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .stat-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.85rem;
+    text-align: center;
+  }
+
+  .stat-box .stat-val {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-box .stat-lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* ── Red flag markers ── */
+  .flag {
+    display: inline-block;
+    background: rgba(224,85,85,0.15);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+
+  .flag.hidden { display: none; }
+
+  /* ── Question ── */
+  .question-block {
+    margin-bottom: 1.5rem;
+  }
+
+  .q-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .q-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+  }
+
+  .choices { display: grid; gap: 0.65rem; }
+
+  .choice {
+    background: var(--surface);
+    border: 2px solid var(--surface2);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text);
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    line-height: 1.5;
+  }
+
+  .choice:hover:not(:disabled) { border-color: var(--accent); }
+  .choice:disabled { cursor: default; }
+  .choice.selected-good { border-color: var(--accent); background: rgba(0,229,160,0.08); }
+  .choice.selected-bad  { border-color: var(--danger);  background: rgba(224,85,85,0.08); }
+  .choice.selected-mid  { border-color: var(--amber);   background: rgba(245,166,35,0.08); }
+
+  /* ── Consequence panel ── */
+  .consequence {
+    display: none;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--accent);
+    animation: fadeUp 0.35s ease;
+  }
+
+  .consequence.bad  { border-color: var(--danger); }
+  .consequence.mid  { border-color: var(--amber); }
+  .consequence.show { display: block; }
+
+  .consequence .c-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .consequence.bad  .c-tag { color: var(--danger); }
+  .consequence      .c-tag { color: var(--accent); }
+  .consequence.mid  .c-tag { color: var(--amber); }
+
+  .consequence p { font-size: 0.95rem; color: var(--text); line-height: 1.7; }
+
+  /* ── Bias reveal ── */
+  .bias-reveal {
+    display: none;
+    background: rgba(224,85,85,0.08);
+    border: 1px solid rgba(224,85,85,0.3);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-top: 0.75rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .bias-reveal.show { display: block; }
+  .bias-reveal strong { color: var(--danger); }
+
+  /* ── Result screen ── */
+  #result-screen { text-align: center; padding: 2rem 0 4rem; }
+
+  .result-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  #result-title {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  #result-summary {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 520px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .score-cell {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.25rem 0.75rem;
+  }
+
+  .score-cell .sc-val {
+    font-size: 2rem;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .score-cell .sc-lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .lesson-list {
+    text-align: left;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .lesson-list h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .lesson-item {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .lesson-item .li-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.55rem;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--accent);
+    color: #0d1117;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.8rem 1.75rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+
+  .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 2px solid var(--surface2);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.8rem 1.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+
+  .nav-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  #next-btn { display: none; }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--surface2);
+    margin: 1.5rem 0;
+  }
+
+  @media (max-width: 480px) {
+    .score-grid { grid-template-columns: 1fr 1fr; }
+    .stat-row   { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div id="bias-bar-wrap">
+  <span id="bias-label">Critical Thinking</span>
+  <div id="bias-track"><div id="bias-fill"></div></div>
+  <span id="bias-score-label">Neutral</span>
+</div>
+
+<main>
+
+  <!-- ══ INTRO ══ -->
+  <div class="screen active" id="screen-intro">
+    <p class="eyebrow">Critical Thinking Simulation</p>
+    <h1>The<br><em>Briefing</em></h1>
+    <p class="intro-body">You're a senior manager at a mid-sized retailer. A report has landed on your desk. A decision is needed by end of day. How carefully you read what's in front of you will determine what happens next.</p>
+
+    <div class="scenario-card">
+      <p class="tag">Your situation</p>
+      <p>Sales have been flat for two quarters. Your regional director is pushing for answers. A market research firm has just delivered a report on customer behaviour, and your team is waiting for your recommendation on next steps.</p>
+    </div>
+
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem;">There are four decision points. Each choice affects your critical thinking score. At the end, you'll see what biases shaped your decisions -- and why they matter.</p>
+
+    <button class="btn" onclick="goTo('screen-1')">Start the briefing &rarr;</button>
+  </div>
+
+  <!-- ══ SCREEN 1: The report arrives ══ -->
+  <div class="screen" id="screen-1">
+    <p class="eyebrow">Decision 1 of 4</p>
+
+    <div class="doc-card">
+      <div class="doc-header">
+        <div class="doc-icon">📊</div>
+        <div class="doc-meta">
+          <div class="doc-title">Customer Sentiment Report Q3 <span class="flag hidden" id="flag-1">Source not verified</span></div>
+          <div class="doc-source">Prepared by: Apex Market Research &bull; Commissioned by: Sales Director</div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>Our survey of <strong>312 customers</strong> found that <strong>74% are dissatisfied</strong> with in-store experience. Key complaints centred on staff availability and checkout wait times. Competitor NPS scores are running 18 points higher than your current rating.</p>
+        <div class="stat-row">
+          <div class="stat-box"><span class="stat-val">74%</span><span class="stat-lbl">Dissatisfied</span></div>
+          <div class="stat-box"><span class="stat-val">312</span><span class="stat-lbl">Respondents</span></div>
+          <div class="stat-box"><span class="stat-val">−18</span><span class="stat-lbl">NPS vs competitors</span></div>
+        </div>
+        <p style="color:var(--muted);font-size:0.85rem;margin-top:0.5rem;">Note: Survey conducted online over 72 hours. Respondents self-selected via email invitation sent to customers who contacted support in the past 30 days.</p>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <p class="q-label">Your decision</p>
+      <p class="q-text">Your director wants a one-line summary of what this report says. What do you send?</p>
+      <div class="choices" id="choices-1">
+        <button class="choice" onclick="choose(1,'bad','c1-bad')">
+          "Report confirms 74% of customers are dissatisfied -- urgent action needed on in-store experience."
+        </button>
+        <button class="choice" onclick="choose(1,'good','c1-good')">
+          "Report flags dissatisfaction concerns, but sample skews toward recent complainants -- worth sense-checking before we act."
+        </button>
+        <button class="choice" onclick="choose(1,'mid','c1-mid')">
+          "Survey shows high dissatisfaction. I'd like to see broader data before we draw firm conclusions."
+        </button>
+      </div>
+
+      <div class="consequence bad" id="c1-bad">
+        <p class="c-tag">&#9650; Consequence</p>
+        <p>Your director forwards your summary to the board. A £200k store refurbishment programme is approved based on a survey of 312 self-selected complainants. Three months later, wider customer data shows overall satisfaction is actually up 6% year on year.</p>
+        <div class="bias-reveal show">
+          <strong>Bias identified: Availability bias + confirmation bias.</strong> The most prominent number (74%) was taken at face value. The methodology note -- that respondents were drawn exclusively from recent support contacts -- was overlooked. Dissatisfied customers were always going to dominate this sample.
+        </div>
+      </div>
+
+      <div class="consequence" id="c1-good">
+        <p class="c-tag">&#10003; Good call</p>
+        <p>Your director appreciates the caveat. Before any budget is committed, the team commissions a broader survey of 2,000 randomly selected customers. The picture is more nuanced -- and the response is proportionate.</p>
+        <div class="bias-reveal show" style="background:rgba(0,229,160,0.06);border-color:rgba(0,229,160,0.3);">
+          <strong style="color:var(--accent);">Critical thinking in action.</strong> You spotted that the sample was self-selecting -- customers invited after a support interaction are not representative of the wider base. One sentence in the methodology note changed the entire framing.
+        </div>
+      </div>
+
+      <div class="consequence mid" id="c1-mid">
+        <p class="c-tag">&#9651; Partial credit</p>
+        <p>Sensible instinct. However, asking for "broader data" without specifying what's wrong with this data means the request gets deprioritised. The director moves forward with a watered-down version of the original plan.</p>
+        <div class="bias-reveal show" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.3);">
+          <strong style="color:var(--amber);">Close -- but vague.</strong> You sensed something was off but couldn't name it precisely. Identifying the specific flaw (self-selected complainant sample) would have given your pushback much more weight.
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" id="next-btn-1" style="display:none" onclick="goTo('screen-2')">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 2: The headline ══ -->
+  <div class="screen" id="screen-2">
+    <p class="eyebrow">Decision 2 of 4</p>
+
+    <div class="doc-card">
+      <div class="doc-header">
+        <div class="doc-icon">📰</div>
+        <div class="doc-meta">
+          <div class="doc-title">Industry news <span class="flag hidden" id="flag-2">Unverified claim</span></div>
+          <div class="doc-source">RetailWeekly Newsletter &bull; This morning</div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>Your colleague has forwarded a newsletter with a highlighted section:</p>
+        <blockquote style="border-left:3px solid var(--amber);padding-left:1rem;margin:1rem 0;color:var(--muted);font-style:italic;">
+          "Industry insiders report that retailers investing in self-checkout technology saw an average 23% uplift in customer satisfaction scores last year."
+        </blockquote>
+        <p>Your colleague has added a note: <em>"This is exactly what we need. Should we fast-track the self-checkout rollout?"</em></p>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <p class="q-label">Your decision</p>
+      <p class="q-text">How do you respond to your colleague?</p>
+      <div class="choices" id="choices-2">
+        <button class="choice" onclick="choose(2,'bad','c2-bad')">
+          "Agreed -- this supports the case perfectly. Let's put together a proposal this week."
+        </button>
+        <button class="choice" onclick="choose(2,'good','c2-good')">
+          "Interesting, but 'industry insiders' with no source cited isn't evidence. What retailers, what baseline, what methodology? I'd want to see the original research before we cite this."
+        </button>
+        <button class="choice" onclick="choose(2,'mid','c2-mid')">
+          "Worth keeping in mind, but let's not rely on one newsletter article to justify the investment."
+        </button>
+      </div>
+
+      <div class="consequence bad" id="c2-bad">
+        <p class="c-tag">&#9650; Consequence</p>
+        <p>The statistic appears in your board proposal. During the presentation, a non-executive director asks for the original source. No one can produce it. The proposal is sent back. The delay costs six weeks and significant credibility.</p>
+        <div class="bias-reveal show">
+          <strong>Bias identified: Bandwagon effect + authority bias.</strong> "Industry insiders" carries an implied authority that the claim doesn't support. The statistic confirmed what you already wanted to do -- so it wasn't scrutinised.
+        </div>
+      </div>
+
+      <div class="consequence" id="c2-good">
+        <p class="c-tag">&#10003; Good call</p>
+        <p>Your colleague tracks down the original research. It turns out the 23% figure applies only to large-format grocery retailers -- a completely different context. The team finds more relevant benchmarks instead.</p>
+        <div class="bias-reveal show" style="background:rgba(0,229,160,0.06);border-color:rgba(0,229,160,0.3);">
+          <strong style="color:var(--accent);">Source scrutiny saves the day.</strong> Asking three simple questions -- who, what baseline, what method -- prevented a misleading statistic from reaching the board.
+        </div>
+      </div>
+
+      <div class="consequence mid" id="c2-mid">
+        <p class="c-tag">&#9651; Partial credit</p>
+        <p>Reasonable caution, but the statistic stays in the background conversation and resurfaces later in a slightly different form. Without explicitly questioning the source, you haven't fully neutralised it.</p>
+        <div class="bias-reveal show" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.3);">
+          <strong style="color:var(--amber);">Good instinct, incomplete follow-through.</strong> Scepticism without a specific challenge leaves bad data in circulation.
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" id="next-btn-2" style="display:none" onclick="goTo('screen-3')">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 3: The expert ══ -->
+  <div class="screen" id="screen-3">
+    <p class="eyebrow">Decision 3 of 4</p>
+
+    <div class="doc-card">
+      <div class="doc-header">
+        <div class="doc-icon">🎙️</div>
+        <div class="doc-meta">
+          <div class="doc-title">Consultant debrief <span class="flag hidden" id="flag-3">Conflict of interest</span></div>
+          <div class="doc-source">Meeting notes &bull; Retail Experience Consulting Ltd</div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>You've sat in on a 30-minute presentation from an external consultant brought in by the Sales Director. Key takeaway from their slides:</p>
+        <blockquote style="border-left:3px solid var(--amber);padding-left:1rem;margin:1rem 0;color:var(--muted);font-style:italic;">
+          "In our experience working with over 200 retailers, the single highest-impact intervention is always a frontline staff retraining programme. Retailers who invest here see results within 90 days."
+        </blockquote>
+        <p style="margin-top:0.75rem;">The consultant's firm offers a proprietary 12-week retraining programme. Pricing starts at £85,000.</p>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <p class="q-label">Your decision</p>
+      <p class="q-text">The Sales Director asks for your view on whether to proceed with the consultant's programme.</p>
+      <div class="choices" id="choices-3">
+        <button class="choice" onclick="choose(3,'bad','c3-bad')">
+          "They seem credible and experienced. If 200+ retailers have seen results, it's hard to argue against it."
+        </button>
+        <button class="choice" onclick="choose(3,'good','c3-good')">
+          "Before we commit, I'd want to understand their commercial interest here, see independent evidence of results, and get references from comparable retailers -- not just their own case studies."
+        </button>
+        <button class="choice" onclick="choose(3,'mid','c3-mid')">
+          "Worth considering, but £85k is a big commitment. Can we negotiate a smaller pilot first?"
+        </button>
+      </div>
+
+      <div class="consequence bad" id="c3-bad">
+        <p class="c-tag">&#9650; Consequence</p>
+        <p>The programme is approved. Post-engagement, the "200 retailers" turns out to refer to a mix of advisory sessions, workshops, and full programmes across 15 years. Comparable outcome data for your sector doesn't exist. Results after 90 days are inconclusive.</p>
+        <div class="bias-reveal show">
+          <strong>Bias identified: Authority bias + vague social proof.</strong> "200 retailers" sounds like robust evidence but is an unverified aggregate. The consultant's financial interest in recommending their own programme was not factored in.
+        </div>
+      </div>
+
+      <div class="consequence" id="c3-good">
+        <p class="c-tag">&#10003; Good call</p>
+        <p>The consultant provides three references. One responds. Their experience was positive but in a different sector. You identify a more targeted provider with independently audited results in your specific retail category.</p>
+        <div class="bias-reveal show" style="background:rgba(0,229,160,0.06);border-color:rgba(0,229,160,0.3);">
+          <strong style="color:var(--accent);">Conflict of interest, caught.</strong> Anyone selling a solution has an inherent interest in the problem being confirmed. That doesn't make them wrong -- but it means their evidence needs independent verification.
+        </div>
+      </div>
+
+      <div class="consequence mid" id="c3-mid">
+        <p class="c-tag">&#9651; Partial credit</p>
+        <p>A pilot is agreed. It's a proportionate financial risk, but the underlying question of whether this is the right intervention -- and the right provider -- hasn't been properly tested.</p>
+        <div class="bias-reveal show" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.3);">
+          <strong style="color:var(--amber);">Pragmatic, but incomplete.</strong> Managing cost risk is sensible. But a smaller version of the wrong solution is still the wrong solution.
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" id="next-btn-3" style="display:none" onclick="goTo('screen-4')">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN 4: The team meeting ══ -->
+  <div class="screen" id="screen-4">
+    <p class="eyebrow">Decision 4 of 4</p>
+
+    <div class="doc-card">
+      <div class="doc-header">
+        <div class="doc-icon">👥</div>
+        <div class="doc-meta">
+          <div class="doc-title">Team meeting <span class="flag hidden" id="flag-4">Group consensus pressure</span></div>
+          <div class="doc-source">Internal &bull; Your team of six</div>
+        </div>
+      </div>
+      <div class="doc-body">
+        <p>You've called a team meeting to review the options. Five of your six team members quickly align around one conclusion: the problem is clearly the checkout experience, and the fix is self-checkout. The sixth -- your most junior team member -- quietly suggests the data might point to a staffing levels issue rather than technology.</p>
+        <p style="margin-top:0.75rem;">The room moves on. The junior team member doesn't push back further.</p>
+      </div>
+    </div>
+
+    <div class="question-block">
+      <p class="q-label">Your decision</p>
+      <p class="q-text">How do you handle the meeting?</p>
+      <div class="choices" id="choices-4">
+        <button class="choice" onclick="choose(4,'bad','c4-bad')">
+          "The majority view makes sense. Note the alternative point and move to next steps on self-checkout."
+        </button>
+        <button class="choice" onclick="choose(4,'good','c4-good')">
+          "Pause the meeting. Ask the junior team member to walk through their reasoning. Make space for the dissenting view before the group commits."
+        </button>
+        <button class="choice" onclick="choose(4,'mid','c4-mid')">
+          "Acknowledge both views in the meeting notes. Ask both sides to bring supporting data to a follow-up session."
+        </button>
+      </div>
+
+      <div class="consequence bad" id="c4-bad">
+        <p class="c-tag">&#9650; Consequence</p>
+        <p>Self-checkout is rolled out. Eighteen months later, an internal review finds that the primary driver of dissatisfaction was staff-to-customer ratios during peak hours -- something self-checkout made worse, not better. The junior team member's read had been correct.</p>
+        <div class="bias-reveal show">
+          <strong>Bias identified: Groupthink + HiPPO effect.</strong> Five people agreeing quickly is not the same as five people being right. Junior voices are often suppressed by seniority and social pressure -- and frequently hold the most useful outside perspective.
+        </div>
+      </div>
+
+      <div class="consequence" id="c4-good">
+        <p class="c-tag">&#10003; Good call</p>
+        <p>The junior team member presents a clear analysis showing peak-hour staffing gaps correlating directly with complaint spikes. The group reconsiders. The eventual recommendation is a staffing model change -- lower cost, faster to implement, and measurably effective within 60 days.</p>
+        <div class="bias-reveal show" style="background:rgba(0,229,160,0.06);border-color:rgba(0,229,160,0.3);">
+          <strong style="color:var(--accent);">The room nearly missed it.</strong> Creating space for the dissenting voice changed the outcome entirely. Good critical thinking in groups means actively protecting minority views from social pressure.
+        </div>
+      </div>
+
+      <div class="consequence mid" id="c4-mid">
+        <p class="c-tag">&#9651; Partial credit</p>
+        <p>The follow-up session happens, but the group dynamic has already set. The majority view carries the day, with minor modifications. The junior team member's core insight doesn't get the hearing it deserved.</p>
+        <div class="bias-reveal show" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.3);">
+          <strong style="color:var(--amber);">Process without intent.</strong> Requesting data from both sides is fair, but if the room has already decided, the process becomes theatre. The moment to intervene was in the meeting itself.
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" id="next-btn-4" style="display:none" onclick="showResult()">See your results &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ══ RESULT ══ -->
+  <div class="screen" id="screen-result">
+    <div id="result-screen">
+      <span class="result-icon" id="result-icon">🧠</span>
+      <h1 id="result-title"></h1>
+      <p id="result-summary"></p>
+
+      <div class="score-grid">
+        <div class="score-cell">
+          <span class="sc-val" id="sc-good" style="color:var(--accent)">0</span>
+          <span class="sc-lbl">Sharp calls</span>
+        </div>
+        <div class="score-cell">
+          <span class="sc-val" id="sc-mid" style="color:var(--amber)">0</span>
+          <span class="sc-lbl">Partial reads</span>
+        </div>
+        <div class="score-cell">
+          <span class="sc-val" id="sc-bad" style="color:var(--danger)">0</span>
+          <span class="sc-lbl">Missed</span>
+        </div>
+      </div>
+
+      <div class="lesson-list">
+        <h3>Biases in play today</h3>
+        <div class="lesson-item"><div class="li-dot"></div><div><strong>Availability bias</strong> -- the most prominent number feels like the most important one. It rarely is.</div></div>
+        <div class="lesson-item"><div class="li-dot"></div><div><strong>Confirmation bias</strong> -- evidence that fits what we already believe gets waved through unchecked.</div></div>
+        <div class="lesson-item"><div class="li-dot"></div><div><strong>Authority bias</strong> -- credentials and confident language are not the same as reliable evidence.</div></div>
+        <div class="lesson-item"><div class="li-dot"></div><div><strong>Groupthink</strong> -- speed of consensus is not a measure of quality of thinking.</div></div>
+      </div>
+
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-ghost" onclick="restart()">Try again</button>
+        <button class="btn" onclick="goTo('screen-intro')">Read the briefing again &rarr;</button>
+      </div>
+
+      <div style="text-align:center;margin-top:3rem;padding-top:2rem;border-top:1px solid var(--surface2);">
+        <p style="font-size:0.75rem;color:var(--muted);">Built by <strong style="color:var(--accent);">DTTtech.com</strong></p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── State ──
+  const answers = {};  // { 1: 'good'|'mid'|'bad', ... }
+  const SCREENS = ['screen-intro','screen-1','screen-2','screen-3','screen-4','screen-result'];
+  let currentScreen = 0;
+
+  const BIAS_LABELS = {
+    100: 'Exemplary',
+    80:  'Sharp',
+    60:  'Developing',
+    40:  'Clouded',
+    20:  'Biased',
+    0:   'Uncritical'
+  };
+
+  // ── Navigation ──
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    currentScreen = SCREENS.indexOf(id);
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress() {
+    const pct = (currentScreen / (SCREENS.length - 1)) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+  }
+
+  // ── Bias meter ──
+  function updateBiasMeter() {
+    const total = Object.keys(answers).length;
+    if (total === 0) return;
+    const good = Object.values(answers).filter(v => v === 'good').length;
+    const mid  = Object.values(answers).filter(v => v === 'mid').length;
+    const score = ((good * 2 + mid) / (total * 2)) * 100;
+
+    document.getElementById('bias-fill').style.width = score + '%';
+
+    // Colour shifts with score
+    const fill = document.getElementById('bias-fill');
+    if (score >= 75) fill.style.background = '#00e5a0';
+    else if (score >= 45) fill.style.background = '#f5a623';
+    else fill.style.background = '#e05555';
+
+    // Label
+    const label = score >= 85 ? 'Exemplary' :
+                  score >= 65 ? 'Sharp' :
+                  score >= 45 ? 'Developing' :
+                  score >= 25 ? 'Clouded' : 'Uncritical';
+    document.getElementById('bias-score-label').textContent = label;
+  }
+
+  // ── Choice handler ──
+  function choose(q, quality, consequenceId) {
+    answers[q] = quality;
+
+    // Disable all choices for this question
+    document.querySelectorAll(`#choices-${q} .choice`).forEach(btn => {
+      btn.disabled = true;
+    });
+
+    // Style selected button
+    const qualityClass = quality === 'good' ? 'selected-good' :
+                         quality === 'bad'  ? 'selected-bad'  : 'selected-mid';
+    event.target.classList.add(qualityClass);
+
+    // Show consequence
+    document.getElementById(consequenceId).classList.add('show');
+
+    // Show next button
+    const nextBtn = document.getElementById(`next-btn-${q}`);
+    if (nextBtn) nextBtn.style.display = 'inline-flex';
+
+    updateBiasMeter();
+  }
+
+  // ── Result ──
+  function showResult() {
+    const good = Object.values(answers).filter(v => v === 'good').length;
+    const mid  = Object.values(answers).filter(v => v === 'mid').length;
+    const bad  = Object.values(answers).filter(v => v === 'bad').length;
+
+    document.getElementById('sc-good').textContent = good;
+    document.getElementById('sc-mid').textContent  = mid;
+    document.getElementById('sc-bad').textContent  = bad;
+
+    let icon, title, summary;
+
+    if (good === 4) {
+      icon    = '🧠';
+      title   = 'Exceptionally sharp.';
+      summary = 'You questioned the sample, challenged the source, identified the conflict of interest, and protected the dissenting voice. That combination is rarer than it should be in most organisations.';
+    } else if (good >= 3) {
+      icon    = '🎯';
+      title   = 'Strong critical reader.';
+      summary = 'You caught most of the traps. One slipped through -- which is realistic. The discipline of asking "what am I not being shown?" is clearly part of how you think.';
+    } else if (good + mid >= 3) {
+      icon    = '⚖️';
+      title   = 'Cautious, but room to sharpen.';
+      summary = 'Your instincts are sound, but vague scepticism isn\'t always enough. Naming the specific flaw in an argument -- the biased sample, the undisclosed interest -- is what turns a hunch into a defensible position.';
+    } else {
+      icon    = '🔍';
+      title   = 'The briefing got the better of you.';
+      summary = 'Several pieces of information were accepted at face value when they warranted scrutiny. The good news: these are learnable patterns. Recognising them is the first step to catching them in real time.';
+    }
+
+    document.getElementById('result-icon').textContent  = icon;
+    document.getElementById('result-title').textContent = title;
+    document.getElementById('result-summary').textContent = summary;
+
+    goTo('screen-result');
+  }
+
+  // ── Restart ──
+  function restart() {
+    Object.keys(answers).forEach(k => delete answers[k]);
+
+    for (let q = 1; q <= 4; q++) {
+      document.querySelectorAll(`#choices-${q} .choice`).forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('selected-good','selected-bad','selected-mid');
+      });
+      ['good','bad','mid'].forEach(t => {
+        const el = document.getElementById(`c${q}-${t}`);
+        if (el) el.classList.remove('show');
+      });
+      const nb = document.getElementById(`next-btn-${q}`);
+      if (nb) nb.style.display = 'none';
+    }
+
+    document.getElementById('bias-fill').style.width = '50%';
+    document.getElementById('bias-fill').style.background = '#00e5a0';
+    document.getElementById('bias-score-label').textContent = 'Neutral';
+    document.getElementById('progress-bar').style.width = '0%';
+
+    goTo('screen-intro');
+  }
+
+  // ── Init ──
+  document.getElementById('bias-fill').style.width = '50%';
+</script>
+</body>
+</html>
