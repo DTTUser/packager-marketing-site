@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Machine — The Debate</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161d2a;
+    --surface2: #1e2736;
+    --accent:   #00e5a0;
+    --amber:    #f5a623;
+    --danger:   #e05555;
+    --text:     #ffffff;
+    --muted:    #a0aab8;
+    --radius:   12px;
+    --sjp:      #4a9eff;   /* Social Justice Party blue */
+    --fmp:      #f5a623;   /* Free Market Party amber */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Top bar ── */
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--surface2);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .top-bar .app-name {
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .top-bar .app-name span { color: var(--accent); }
+
+  .top-bar .topic-pill {
+    background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.3);
+    color: var(--accent);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+  }
+
+  /* ── Breaking banner ── */
+  .breaking {
+    background: linear-gradient(135deg, #1a1f2e 0%, #161d2a 100%);
+    border-bottom: 3px solid var(--accent);
+    padding: 1.25rem 1.25rem 1rem;
+    text-align: center;
+  }
+
+  .breaking .breaking-tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d1117;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+  }
+
+  .breaking h1 {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .breaking p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ── Layout ── */
+  .feed-wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 1.25rem 1rem 4rem;
+  }
+
+  /* ── Vote card ── */
+  .vote-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--surface2);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .vote-card.pinned {
+    border-color: var(--accent);
+    position: relative;
+  }
+
+  .pin-label {
+    position: absolute;
+    top: -1px; right: 12px;
+    background: var(--accent);
+    color: #0d1117;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* ── Avatar ── */
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .avatar.sjp { background: rgba(74,158,255,0.2); color: var(--sjp); border: 2px solid var(--sjp); }
+  .avatar.fmp { background: rgba(245,166,35,0.2); color: var(--fmp); border: 2px solid var(--fmp); }
+  .avatar.citizen { background: var(--surface2); color: var(--muted); border: 2px solid var(--surface2); font-size: 0.75rem; }
+  .avatar.news { background: rgba(224,85,85,0.15); color: var(--danger); border: 2px solid var(--danger); font-size: 0.75rem; }
+
+  /* ── Post content ── */
+  .post-body { flex: 1; min-width: 0; }
+
+  .post-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+
+  .post-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .post-name.sjp { color: var(--sjp); }
+  .post-name.fmp { color: var(--fmp); }
+
+  .post-handle {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .post-time {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .post-party-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .post-party-tag.sjp { background: rgba(74,158,255,0.15); color: var(--sjp); }
+  .post-party-tag.fmp { background: rgba(245,166,35,0.15); color: var(--fmp); }
+
+  .post-text {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  .post-text .highlight {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .post-text .hash {
+    color: var(--sjp);
+    font-weight: 500;
+  }
+
+  .post-text .hash.fmp { color: var(--fmp); }
+
+  /* ── Stat card inside post ── */
+  .stat-card {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 3px solid var(--accent);
+  }
+
+  .stat-card .sc-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-card .sc-val {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-card .sc-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  .stat-card.amber { border-color: var(--fmp); }
+  .stat-card.amber .sc-val { color: var(--fmp); }
+
+  .stat-row-mini {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-row-mini .stat-card { flex: 1; margin-bottom: 0; }
+
+  /* ── Quote post ── */
+  .quote-post {
+    background: var(--surface2);
+    border: 1px solid var(--surface2);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .quote-post .q-name {
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .quote-post .q-name.sjp { color: var(--sjp); }
+  .quote-post .q-name.fmp { color: var(--fmp); }
+
+  .quote-post .q-text {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Reactions ── */
+  .reactions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .reaction {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .reaction:hover { color: var(--accent); }
+  .reaction.liked { color: var(--danger); }
+  .reaction .r-icon { font-size: 0.95rem; }
+
+  /* ── Divider ── */
+  .feed-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+  }
+
+  .feed-divider span {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .feed-divider::before,
+  .feed-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--surface2);
+  }
+
+  /* ── Reply thread ── */
+  .reply-thread {
+    margin-left: 1.5rem;
+    border-left: 2px solid var(--surface2);
+    padding-left: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Timer card ── */
+  .timer-card {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .timer-card .t-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .timer-display {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.5rem;
+    transition: color 0.5s;
+  }
+
+  .timer-display.urgent { color: var(--danger); }
+
+  .timer-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Vote buttons ── */
+  .vote-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .vote-btn {
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s, border-color 0.2s;
+    line-height: 1.3;
+  }
+
+  .vote-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+  .vote-btn:disabled { cursor: default; transform: none; }
+
+  .vote-btn.sjp-btn {
+    background: rgba(74,158,255,0.15);
+    border-color: var(--sjp);
+    color: var(--sjp);
+  }
+
+  .vote-btn.fmp-btn {
+    background: rgba(245,166,35,0.15);
+    border-color: var(--fmp);
+    color: var(--fmp);
+  }
+
+  .vote-btn.voted {
+    opacity: 1;
+  }
+
+  .vote-btn.voted.sjp-btn { background: rgba(74,158,255,0.3); }
+  .vote-btn.voted.fmp-btn { background: rgba(245,166,35,0.3); }
+  .vote-btn.not-voted { opacity: 0.4; }
+
+  .vote-result {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.85rem;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 0.88rem;
+  }
+
+  .vote-result.show { display: block; }
+
+  .poll-bar-wrap {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .poll-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .poll-bar-row .pb-label { width: 80px; color: var(--muted); }
+  .poll-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--surface);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .poll-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+  .poll-bar-fill.sjp { background: var(--sjp); }
+  .poll-bar-fill.fmp { background: var(--fmp); }
+  .poll-bar-row .pb-pct { width: 36px; text-align: right; font-weight: 700; color: var(--text); }
+
+  /* ── Historical card ── */
+  .history-card {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.75rem;
+    border-top: 3px solid var(--danger);
+  }
+
+  .history-card .hc-tag {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--danger);
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+  }
+
+  .history-card .hc-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .history-card .hc-row:last-child { border-bottom: none; }
+  .history-card .hc-row span:first-child { color: var(--muted); }
+  .history-card .hc-row span:last-child { font-weight: 700; color: var(--text); }
+
+  /* ── Demo label ── */
+  .demo-footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--surface2);
+    margin-top: 1rem;
+  }
+
+  .demo-footer p { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.25rem; }
+  .demo-footer strong { color: var(--accent); }
+
+  /* ── Animate in ── */
+  .post-animate {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: postIn 0.4s ease forwards;
+  }
+
+  @keyframes postIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .vote-buttons { grid-template-columns: 1fr; }
+    .stat-row-mini { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="top-bar">
+  <div class="app-name">Money<span>Machine</span></div>
+  <div class="topic-pill">&#128308; Live debate</div>
+</div>
+
+<!-- ── Breaking banner ── -->
+<div class="breaking">
+  <div class="breaking-tag">Breaking</div>
+  <h1>Island Council votes today on 1% Solidarity Tax</h1>
+  <p>Both parties have taken to the feed. The vote closes in 90 seconds. Read the arguments — then cast yours.</p>
+</div>
+
+<!-- ── Feed ── -->
+<div class="feed-wrap">
+
+  <!-- Pinned: official proposal -->
+  <div class="vote-card pinned post-animate" style="animation-delay:0.05s">
+    <div class="pin-label">Pinned</div>
+    <div class="avatar news">📋</div>
+    <div class="post-body">
+      <div class="post-header">
+        <span class="post-name">Island Council</span>
+        <span class="post-handle">@islandcouncil</span>
+        <span class="post-time">Today</span>
+      </div>
+      <div class="post-text">
+        The Council is voting today on the <span class="highlight">1% Solidarity Tax on personal wealth exceeding $10 million</span>. Revenue will fund refugee housing, emergency assistance, and social services. Both parties have submitted their positions below. Read them. Then vote.
+        <br><br>
+        <span class="hash">#SolidarityTax</span> <span class="hash">#IslandCouncil</span>
+      </div>
+      <div class="reactions">
+        <button class="reaction"><span class="r-icon">👁</span> 14.2k views</button>
+        <button class="reaction"><span class="r-icon">🔁</span> 841</button>
+        <button class="reaction"><span class="r-icon">🔗</span> Share</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feed-divider"><span>Social Justice Party</span></div>
+
+  <!-- SJP post 1 -->
+  <div class="vote-card post-animate" style="animation-delay:0.15s">
+    <div class="avatar sjp">RK</div>
+    <div class="post-body">
+      <div class="post-header">
+        <span class="post-name sjp">Ryan Kane</span>
+        <span class="post-party-tag sjp">Social Justice Party</span>
+        <span class="post-handle">@ryankane_sjp</span>
+        <span class="post-time">2h</span>
+      </div>
+      <div class="post-text">
+        We're talking about <span class="highlight">just one percent</span>.<br><br>
+        Not your salary. Not your home. Not your small business. Only the wealthiest people on the island — those who own more money than they could spend in ten lifetimes.<br><br>
+        Someone like Ilan Gringold won't even <em>notice</em> a one-percent tax. But for the rest of the island, that one percent means schools, hot meals for children, and housing for families sleeping in tents.<br><br>
+        Honestly — who could object to just one percent?
+        <br><br>
+        <span class="hash">#SolidarityTax</span> <span class="hash">#OnePercent</span>
+      </div>
+      <div class="stat-row-mini">
+        <div class="stat-card">
+          <div class="sc-label">Refugees needing housing</div>
+          <div class="sc-val">200</div>
+          <div class="sc-sub">arrived this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-label">Citizens below poverty line</div>
+          <div class="sc-val">12%</div>
+          <div class="sc-sub">of island population</div>
+        </div>
+      </div>
+      <div class="reactions">
+        <button class="reaction liked"><span class="r-icon">❤️</span> 3,847</button>
+        <button class="reaction"><span class="r-icon">🔁</span> 1,203</button>
+        <button class="reaction"><span class="r-icon">💬</span> 412</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reply thread under SJP -->
+  <div class="reply-thread post-animate" style="animation-delay:0.22s">
+    <div class="vote-card" style="margin-bottom:0.5rem;border:none;padding:0.75rem 0;">
+      <div class="avatar citizen">👤</div>
+      <div class="post-body">
+        <div class="post-header">
+          <span class="post-name" style="color:var(--text)">Maria V.</span>
+          <span class="post-handle">@maria_harbor</span>
+          <span class="post-time">1h</span>
+        </div>
+        <div class="post-text" style="font-size:0.85rem;">
+          My children go to the school near the camp. Those families need help NOW. This tax is the only proposal on the table. Vote yes. <span class="hash">#SolidarityTax</span>
+        </div>
+        <div class="reactions">
+          <button class="reaction liked"><span class="r-icon">❤️</span> 892</button>
+          <button class="reaction"><span class="r-icon">🔁</span> 341</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feed-divider"><span>Free Market Party</span></div>
+
+  <!-- FMP post 1 -->
+  <div class="vote-card post-animate" style="animation-delay:0.3s">
+    <div class="avatar fmp">JB</div>
+    <div class="post-body">
+      <div class="post-header">
+        <span class="post-name fmp">Jadwiga Brylska</span>
+        <span class="post-party-tag fmp">Free Market Party</span>
+        <span class="post-handle">@brylska_fmp</span>
+        <span class="post-time">2h</span>
+      </div>
+      <div class="post-text">
+        I am not opposed to one percent.<br>
+        I am opposed to <span class="highlight">the first step</span>.<br><br>
+        Once society accepts the principle that government may take wealth whenever it considers necessary, the debate is no longer <em>whether</em> taxes should increase. The only remaining question becomes <em>how much</em>.<br><br>
+        History shows that one percent rarely remains one percent.
+        <br><br>
+        <span class="hash fmp">#TheFirstStep</span> <span class="hash fmp">#FollowTheMoney</span>
+      </div>
+      <div class="history-card">
+        <div class="hc-tag">&#9888; Historical record — this is not fiction</div>
+        <div class="hc-row"><span>US income tax introduced (1913)</span><span>1% lowest rate</span></div>
+        <div class="hc-row"><span>Five years later (1918)</span><span>77% highest rate</span></div>
+        <div class="hc-row"><span>Thirty years later (1944)</span><span>94% highest rate</span></div>
+        <div class="hc-row"><span>Sweden (1976)</span><span>102% effective rate*</span></div>
+      </div>
+      <div class="post-text" style="font-size:0.8rem;color:var(--muted);">*Astrid Lindgren, author of Pippi Longstocking, calculated she owed more in tax than she earned that year. This was reality, not satire.</div>
+      <div class="reactions" style="margin-top:0.75rem;">
+        <button class="reaction liked"><span class="r-icon">❤️</span> 2,614</button>
+        <button class="reaction"><span class="r-icon">🔁</span> 988</button>
+        <button class="reaction"><span class="r-icon">💬</span> 307</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FMP quote-posting SJP -->
+  <div class="vote-card post-animate" style="animation-delay:0.38s">
+    <div class="avatar fmp">JB</div>
+    <div class="post-body">
+      <div class="post-header">
+        <span class="post-name fmp">Jadwiga Brylska</span>
+        <span class="post-party-tag fmp">Free Market Party</span>
+        <span class="post-handle">@brylska_fmp</span>
+        <span class="post-time">1h</span>
+      </div>
+      <div class="quote-post">
+        <div class="q-name sjp">Ryan Kane @ryankane_sjp</div>
+        <div class="q-text">"Someone like Ilan Gringold won't even notice a one-percent tax."</div>
+      </div>
+      <div class="post-text">
+        Ilan Gringold built his factory here. He employs <span class="highlight">840 people</span>. Every jar of his ointment was purchased voluntarily.<br><br>
+        The moment government receives the key to someone else's pocket, its natural tendency is to keep searching for new pockets to open.<br><br>
+        The question is not whether Gringold notices. The question is where he takes his next factory.
+        <br><br>
+        <span class="hash fmp">#Incentives</span> <span class="hash fmp">#CapitalFlight</span>
+      </div>
+      <div class="reactions">
+        <button class="reaction"><span class="r-icon">❤️</span> 1,892</button>
+        <button class="reaction"><span class="r-icon">🔁</span> 743</button>
+        <button class="reaction"><span class="r-icon">💬</span> 219</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reply thread under FMP -->
+  <div class="reply-thread post-animate" style="animation-delay:0.44s">
+    <div class="vote-card" style="margin-bottom:0.5rem;border:none;padding:0.75rem 0;">
+      <div class="avatar citizen">👤</div>
+      <div class="post-body">
+        <div class="post-header">
+          <span class="post-name" style="color:var(--text)">Thomas R.</span>
+          <span class="post-handle">@thomasr_north</span>
+          <span class="post-time">45m</span>
+        </div>
+        <div class="post-text" style="font-size:0.85rem;">
+          Easy to say "capital flight" when you're not the one living in a tent. The wealthy have had decades to help voluntarily. They didn't. <span class="hash">#VoteYes</span>
+        </div>
+        <div class="reactions">
+          <button class="reaction"><span class="r-icon">❤️</span> 1,204</button>
+          <button class="reaction"><span class="r-icon">🔁</span> 287</button>
+        </div>
+      </div>
+    </div>
+    <div class="vote-card" style="border:none;padding:0.75rem 0;">
+      <div class="avatar fmp" style="width:36px;height:36px;font-size:0.85rem;">JB</div>
+      <div class="post-body">
+        <div class="post-header">
+          <span class="post-name fmp">Jadwiga Brylska</span>
+          <span class="post-handle">@brylska_fmp</span>
+          <span class="post-time">30m</span>
+        </div>
+        <div class="post-text" style="font-size:0.85rem;">
+          The Gringold Family Foundation donated $14 million to island charities last year. Voluntarily. Without a council vote. Without an enforcement office. Ask yourself: which system creates more of that?
+        </div>
+        <div class="reactions">
+          <button class="reaction"><span class="r-icon">❤️</span> 876</button>
+          <button class="reaction"><span class="r-icon">🔁</span> 312</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feed-divider"><span>Your vote</span></div>
+
+  <!-- Timer + vote -->
+  <div class="timer-card post-animate" style="animation-delay:0.5s">
+    <div class="t-label">Council vote closes in</div>
+    <div class="timer-display" id="timer">1:30</div>
+    <div class="timer-sub">Move your cursor over each option to preview its consequences before you decide.</div>
+    <div class="vote-buttons">
+      <button class="vote-btn sjp-btn" id="btn-yes" onclick="castVote('yes')" title="Hover to preview">
+        ✓ Introduce the 1% Wealth Tax
+      </button>
+      <button class="vote-btn fmp-btn" id="btn-no" onclick="castVote('no')" title="Hover to preview">
+        ✗ Keep existing tax system
+      </button>
+    </div>
+    <div class="vote-result" id="vote-result">
+      <div style="font-weight:700;margin-bottom:0.5rem;" id="vote-result-text"></div>
+      <div class="poll-bar-wrap">
+        <div class="poll-bar-row">
+          <span class="pb-label">Introduce</span>
+          <div class="poll-bar-track"><div class="poll-bar-fill sjp" id="bar-yes" style="width:0%"></div></div>
+          <span class="pb-pct" id="pct-yes">0%</span>
+        </div>
+        <div class="poll-bar-row">
+          <span class="pb-label">Keep system</span>
+          <div class="poll-bar-track"><div class="poll-bar-fill fmp" id="bar-no" style="width:0%"></div></div>
+          <span class="pb-pct" id="pct-no">0%</span>
+        </div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:0.65rem;">Your decision has been recorded. The consequence cascade begins now.</div>
+    </div>
+  </div>
+
+  <div class="demo-footer">
+    <p>This is a concept demo for <strong>Money Machine</strong> — Branch B visual format.</p>
+    <p>Built by <strong>DTTtech.com</strong></p>
+  </div>
+
+</div>
+
+<script>
+  // ── Timer ──
+  let seconds = 90;
+  let voted = false;
+  const timerEl = document.getElementById('timer');
+
+  const tick = setInterval(() => {
+    if (voted) return;
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerEl.textContent = m + ':' + String(s).padStart(2, '0');
+    if (seconds <= 15) timerEl.classList.add('urgent');
+    if (seconds <= 0) {
+      clearInterval(tick);
+      timerEl.textContent = '0:00';
+      abstain();
+    }
+  }, 1000);
+
+  // ── Vote ──
+  function castVote(choice) {
+    if (voted) return;
+    voted = true;
+    clearInterval(tick);
+
+    const btnYes = document.getElementById('btn-yes');
+    const btnNo  = document.getElementById('btn-no');
+
+    btnYes.disabled = true;
+    btnNo.disabled  = true;
+
+    if (choice === 'yes') {
+      btnYes.classList.add('voted');
+      btnNo.classList.add('not-voted');
+      showResult('You voted to introduce the 1% Wealth Tax.', 54, 46);
+    } else {
+      btnNo.classList.add('voted');
+      btnYes.classList.add('not-voted');
+      showResult('You voted to keep the existing tax system.', 54, 46);
+    }
+  }
+
+  function abstain() {
+    if (voted) return;
+    voted = true;
+    document.getElementById('btn-yes').disabled = true;
+    document.getElementById('btn-no').disabled  = true;
+    document.getElementById('btn-yes').classList.add('not-voted');
+    document.getElementById('btn-no').classList.add('not-voted');
+    showResult('Time expired. You abstained — the Council has decided.', 54, 46);
+  }
+
+  function showResult(msg, pctYes, pctNo) {
+    const resultEl = document.getElementById('vote-result');
+    document.getElementById('vote-result-text').textContent = msg;
+    resultEl.classList.add('show');
+    setTimeout(() => {
+      document.getElementById('bar-yes').style.width = pctYes + '%';
+      document.getElementById('bar-no').style.width  = pctNo  + '%';
+      document.getElementById('pct-yes').textContent = pctYes + '%';
+      document.getElementById('pct-no').textContent  = pctNo  + '%';
+    }, 100);
+  }
+
+  // ── Reaction toggle ──
+  document.querySelectorAll('.reaction').forEach(btn => {
+    if (btn.textContent.includes('views') || btn.textContent.includes('Share')) return;
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('liked');
+    });
+  });
+</script>
+</body>
+</html>
