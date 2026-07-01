@@ -1,650 +1,617 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Learning Packager, wrap any HTML as SCORM</title>
-  <meta name="description" content="Drop in an HTML file or folder, get back a SCORM 1.2 package ready to upload to any LMS. Built for instructional designers, course creators, and L&amp;D teams who want their content tracked without fighting authoring tools.">
-
-  <meta property="og:title" content="AI Learning Packager">
-  <meta property="og:description" content="Wrap any HTML learning content into a SCORM 1.2 package in seconds.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://packager.dtttech.com">
-  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
-  <meta name="twitter:card" content="summary_large_image">
-
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
-
-  <style>
-    :root {
-      --navy-deep: #0a0e27;
-      --navy-mid: #151a3d;
-      --navy-card: #1a2050;
-      --navy-border: #1e2650;
-      --teal: #00d4aa;
-      --teal-deep: #00b894;
-      --text-white: #f0f4ff;
-      --text-muted: #94a3b8;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
-      color: var(--text-white);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    body {
-      background-attachment: fixed;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Header */
-    header {
-      padding: 24px 0;
-      border-bottom: 1px solid var(--navy-border);
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .brand {
-      font-weight: 800;
-      font-size: 18px;
-      color: var(--text-white);
-      text-decoration: none;
-      letter-spacing: -0.3px;
-    }
-
-    .brand span { color: var(--teal); }
-
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      font-size: 14px;
-    }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-    }
-
-    .nav-links a:hover { color: var(--teal); }
-
-    /* Hero */
-    .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      color: var(--teal);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      margin-bottom: 24px;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-size: clamp(36px, 6vw, 56px);
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1.1;
-      margin: 0 0 24px;
-    }
-
-    h1 .accent { color: var(--teal); }
-
-    .lede {
-      font-size: clamp(18px, 2.4vw, 22px);
-      color: var(--text-muted);
-      max-width: 640px;
-      margin: 0 auto 40px;
-      line-height: 1.5;
-    }
-
-    /* Flow diagram */
-    .flow {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      gap: 16px;
-      align-items: center;
-      max-width: 760px;
-      margin: 48px auto 0;
-    }
-
-    .flow-card {
-      background: linear-gradient(180deg, var(--navy-card), var(--navy-mid));
-      border: 1px solid var(--navy-border);
-      border-radius: 14px;
-      padding: 24px 16px;
-      text-align: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    }
-
-    .flow-card.highlight {
-      background: linear-gradient(180deg, var(--teal), var(--teal-deep));
-      border-color: var(--teal);
-      color: var(--navy-deep);
-    }
-
-    .flow-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .flow-card.highlight .flow-label {
-      color: var(--navy-deep);
-      opacity: 0.7;
-    }
-
-    .flow-name {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--teal);
-      margin-bottom: 6px;
-    }
-
-    .flow-card.highlight .flow-name {
-      color: var(--navy-deep);
-      font-size: 18px;
-    }
-
-    .flow-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .flow-card.highlight .flow-sub {
-      color: var(--navy-deep);
-      opacity: 0.75;
-    }
-
-    .flow-arrow {
-      color: var(--teal);
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    @media (max-width: 720px) {
-      .flow {
-        grid-template-columns: 1fr;
-      }
-      .flow-arrow {
-        transform: rotate(90deg);
-        margin: 4px 0;
-      }
-    }
-
-    /* Sections */
-    section {
-      padding: 60px 0;
-      border-top: 1px solid var(--navy-border);
-    }
-
-    h2 {
-      font-size: clamp(26px, 4vw, 36px);
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin: 0 0 16px;
-    }
-
-    .section-lede {
-      color: var(--text-muted);
-      font-size: 17px;
-      max-width: 640px;
-      margin: 0 0 40px;
-    }
-
-    /* Grid of who it's for */
-    .audience {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-    }
-
-    .audience-card {
-      background: var(--navy-card);
-      border: 1px solid var(--navy-border);
-      border-radius: 12px;
-      padding: 24px;
-    }
-
-    .audience-card h3 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      color: var(--teal);
-      font-weight: 700;
-    }
-
-    .audience-card p {
-      margin: 0;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    /* Why list */
-    .why-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 20px;
-    }
-
-    .why-list li {
-      display: grid;
-      grid-template-columns: 28px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .why-check {
-      color: var(--teal);
-      font-weight: 800;
-      font-size: 20px;
-      line-height: 1.4;
-    }
-
-    .why-list h3 {
-      margin: 0 0 4px;
-      font-size: 17px;
-      color: var(--text-white);
-    }
-
-    .why-list p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 15px;
-    }
-
-    /* Blog teaser */
-    .blog-list {
-      display: grid;
-      gap: 16px;
-    }
-
-    .see-all {
-      margin-top: 24px;
-      text-align: right;
-      font-size: 14px;
-    }
-
-    .see-all a {
-      color: var(--teal);
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .see-all a:hover {
-      text-decoration: underline;
-    }
-
-    .blog-card {
-      background: var(--navy-card);
-      border: 1px solid var(--navy-border);
-      border-radius: 12px;
-      padding: 28px;
-      display: block;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s ease, transform 0.15s ease;
-    }
-
-    .blog-card:hover {
-      border-color: var(--teal);
-      transform: translateY(-2px);
-    }
-
-    .blog-card .blog-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin: 0 0 8px;
-    }
-
-    .blog-card h3 {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-      margin: 0 0 8px;
-      color: var(--text-white);
-    }
-
-    .blog-card p {
-      margin: 0 0 16px;
-      color: var(--text-muted);
-      font-size: 15px;
-    }
-
-    .blog-card .read-more {
-      font-size: 14px;
-      color: var(--teal);
-      font-weight: 700;
-    }
-
-    /* CTA / form */
-    .cta {
-      background: linear-gradient(180deg, var(--navy-card), var(--navy-mid));
-      border: 1px solid var(--navy-border);
-      border-radius: 20px;
-      padding: 48px;
-      margin: 40px 0;
-      text-align: center;
-    }
-
-    .cta h2 {
-      margin-bottom: 12px;
-    }
-
-    .cta p {
-      color: var(--text-muted);
-      margin: 0 0 28px;
-      font-size: 16px;
-    }
-
-    .signup-form {
-      display: flex;
-      gap: 12px;
-      max-width: 480px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-    }
-
-    .signup-form input[type="email"] {
-      flex: 1;
-      min-width: 240px;
-      padding: 14px 18px;
-      border-radius: 30px;
-      border: 1px solid var(--navy-border);
-      background: var(--navy-deep);
-      color: var(--text-white);
-      font-size: 15px;
-      font-family: inherit;
-    }
-
-    .signup-form input[type="email"]:focus {
-      outline: none;
-      border-color: var(--teal);
-      box-shadow: 0 0 0 3px rgba(0,212,170,0.2);
-    }
-
-    .signup-form button {
-      padding: 14px 28px;
-      border-radius: 30px;
-      border: none;
-      background: var(--teal);
-      color: var(--navy-deep);
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.15s ease;
-    }
-
-    .signup-form button:hover {
-      background: var(--teal-deep);
-    }
-
-    .form-note {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 16px;
-    }
-
-    /* Honeypot, hidden from real users */
-    .hp-field {
-      position: absolute;
-      left: -5000px;
-      visibility: hidden;
-    }
-
-    /* Footer */
-    footer {
-      padding: 40px 0;
-      border-top: 1px solid var(--navy-border);
-      color: var(--text-muted);
-      font-size: 14px;
-      text-align: center;
-    }
-
-    footer a {
-      color: var(--teal);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Learning Packager, wrap any HTML as SCORM</title>
+<meta name="description" content="Drop in an HTML file or folder, get back a SCORM 1.2 package ready to upload to any LMS. Built for instructional designers, course creators, and L&D teams who want their content tracked without fighting authoring tools.">
+
+<meta property="og:title" content="AI Learning Packager">
+<meta property="og:description" content="Wrap any HTML learning content into a SCORM 1.2 package in seconds.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://packager.dtttech.com">
+<meta property="og:image" content="https://packager.dtttech.com/banner.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+<style>
+:root {
+--navy-deep: #0a0e27;
+--navy-mid: #151a3d;
+--navy-card: #1a2050;
+--navy-border: #1e2650;
+--teal: #00d4aa;
+--teal-deep: #00b894;
+--text-white: #f0f4ff;
+--text-muted: #94a3b8;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+margin: 0;
+padding: 0;
+background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+color: var(--text-white);
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+line-height: 1.6;
+min-height: 100vh;
+}
+
+body {
+background-attachment: fixed;
+}
+
+.container {
+max-width: 960px;
+margin: 0 auto;
+padding: 0 24px;
+}
+
+/* Header */
+header {
+padding: 24px 0;
+border-bottom: 1px solid var(--navy-border);
+}
+
+.nav {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 16px;
+flex-wrap: wrap;
+}
+
+.brand {
+font-weight: 800;
+font-size: 18px;
+color: var(--text-white);
+text-decoration: none;
+letter-spacing: -0.3px;
+}
+
+.brand span { color: var(--teal); }
+
+.nav-links {
+display: flex;
+gap: 24px;
+font-size: 14px;
+align-items: center;
+}
+
+.nav-links a {
+color: var(--text-muted);
+text-decoration: none;
+}
+
+.nav-links a:hover { color: var(--teal); }
+
+.nav-cta {
+background: var(--teal);
+color: var(--navy-deep) !important;
+font-weight: 700;
+padding: 8px 18px;
+border-radius: 30px;
+transition: background 0.15s ease;
+}
+
+.nav-cta:hover {
+background: var(--teal-deep) !important;
+color: var(--navy-deep) !important;
+}
+
+/* Hero */
+.hero {
+padding: 80px 0 60px;
+text-align: center;
+}
+
+.eyebrow {
+display: inline-block;
+color: var(--teal);
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 4px;
+margin-bottom: 24px;
+text-transform: uppercase;
+}
+
+h1 {
+font-size: clamp(36px, 6vw, 56px);
+font-weight: 800;
+letter-spacing: -1.5px;
+line-height: 1.1;
+margin: 0 0 24px;
+}
+
+h1 .accent { color: var(--teal); }
+
+.lede {
+font-size: clamp(18px, 2.4vw, 22px);
+color: var(--text-muted);
+max-width: 640px;
+margin: 0 auto 40px;
+line-height: 1.5;
+}
+
+/* Flow diagram */
+.flow {
+display: grid;
+grid-template-columns: 1fr auto 1fr auto 1fr;
+gap: 16px;
+align-items: center;
+max-width: 760px;
+margin: 48px auto 0;
+}
+
+.flow-card {
+background: linear-gradient(180deg, var(--navy-card), var(--navy-mid));
+border: 1px solid var(--navy-border);
+border-radius: 14px;
+padding: 24px 16px;
+text-align: center;
+box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+}
+
+.flow-card.highlight {
+background: linear-gradient(180deg, var(--teal), var(--teal-deep));
+border-color: var(--teal);
+color: var(--navy-deep);
+}
+
+.flow-label {
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2px;
+color: var(--text-muted);
+text-transform: uppercase;
+margin-bottom: 12px;
+}
+
+.flow-card.highlight .flow-label {
+color: var(--navy-deep);
+opacity: 0.7;
+}
+
+.flow-name {
+font-size: 22px;
+font-weight: 800;
+color: var(--teal);
+margin-bottom: 6px;
+}
+
+.flow-card.highlight .flow-name {
+color: var(--navy-deep);
+font-size: 18px;
+}
+
+.flow-sub {
+font-size: 12px;
+color: var(--text-muted);
+}
+
+.flow-card.highlight .flow-sub {
+color: var(--navy-deep);
+opacity: 0.75;
+}
+
+.flow-arrow {
+color: var(--teal);
+font-size: 24px;
+font-weight: 700;
+}
+
+@media (max-width: 720px) {
+.flow {
+grid-template-columns: 1fr;
+}
+.flow-arrow {
+transform: rotate(90deg);
+margin: 4px 0;
+}
+}
+
+/* Sections */
+section {
+padding: 60px 0;
+border-top: 1px solid var(--navy-border);
+}
+
+h2 {
+font-size: clamp(26px, 4vw, 36px);
+font-weight: 800;
+letter-spacing: -0.5px;
+margin: 0 0 16px;
+}
+
+.section-lede {
+color: var(--text-muted);
+font-size: 17px;
+max-width: 640px;
+margin: 0 0 40px;
+}
+
+/* Grid of who it's for */
+.audience {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+gap: 20px;
+}
+
+.audience-card {
+background: var(--navy-card);
+border: 1px solid var(--navy-border);
+border-radius: 12px;
+padding: 24px;
+}
+
+.audience-card h3 {
+margin: 0 0 8px;
+font-size: 16px;
+color: var(--teal);
+font-weight: 700;
+}
+
+.audience-card p {
+margin: 0;
+font-size: 14px;
+color: var(--text-muted);
+}
+
+/* Why list */
+.why-list {
+list-style: none;
+padding: 0;
+margin: 0;
+display: grid;
+gap: 20px;
+}
+
+.why-list li {
+display: grid;
+grid-template-columns: 28px 1fr;
+gap: 16px;
+align-items: start;
+}
+
+.why-check {
+color: var(--teal);
+font-weight: 800;
+font-size: 20px;
+line-height: 1.4;
+}
+
+.why-list h3 {
+margin: 0 0 4px;
+font-size: 17px;
+color: var(--text-white);
+}
+
+.why-list p {
+margin: 0;
+color: var(--text-muted);
+font-size: 15px;
+}
+
+/* Blog teaser */
+.blog-list {
+display: grid;
+gap: 16px;
+}
+
+.see-all {
+margin-top: 24px;
+text-align: right;
+font-size: 14px;
+}
+
+.see-all a {
+color: var(--teal);
+text-decoration: none;
+font-weight: 700;
+}
+
+.see-all a:hover {
+text-decoration: underline;
+}
+
+.blog-card {
+background: var(--navy-card);
+border: 1px solid var(--navy-border);
+border-radius: 12px;
+padding: 28px;
+display: block;
+text-decoration: none;
+color: inherit;
+transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.blog-card:hover {
+border-color: var(--teal);
+transform: translateY(-2px);
+}
+
+.blog-card .blog-meta {
+font-size: 12px;
+color: var(--text-muted);
+letter-spacing: 1px;
+text-transform: uppercase;
+margin: 0 0 8px;
+}
+
+.blog-card h3 {
+font-size: 22px;
+font-weight: 800;
+letter-spacing: -0.3px;
+margin: 0 0 8px;
+color: var(--text-white);
+}
+
+.blog-card p {
+margin: 0 0 16px;
+color: var(--text-muted);
+font-size: 15px;
+}
+
+.blog-card .read-more {
+font-size: 14px;
+color: var(--teal);
+font-weight: 700;
+}
+
+/* CTA box */
+.cta {
+background: linear-gradient(180deg, var(--navy-card), var(--navy-mid));
+border: 1px solid var(--navy-border);
+border-radius: 20px;
+padding: 48px;
+margin: 40px 0;
+text-align: center;
+}
+
+.cta h2 {
+margin-bottom: 12px;
+}
+
+.cta p {
+color: var(--text-muted);
+margin: 0 0 32px;
+font-size: 16px;
+}
+
+.cta-btn {
+display: inline-block;
+padding: 16px 36px;
+border-radius: 30px;
+background: var(--teal);
+color: var(--navy-deep);
+font-weight: 700;
+font-size: 17px;
+text-decoration: none;
+transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cta-btn:hover {
+background: var(--teal-deep);
+transform: translateY(-2px);
+}
+
+.cta-note {
+font-size: 13px;
+color: var(--text-muted);
+margin-top: 16px;
+}
+
+/* Footer */
+footer {
+padding: 40px 0;
+border-top: 1px solid var(--navy-border);
+color: var(--text-muted);
+font-size: 14px;
+text-align: center;
+}
+
+footer a {
+color: var(--teal);
+text-decoration: none;
+}
+
+footer a:hover {
+text-decoration: underline;
+}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="container nav">
-      <a href="/" class="brand">AI Learning <span>Packager</span></a>
-      <nav class="nav-links">
-        <a href="#what">What it does</a>
-        <a href="#who">Who it is for</a>
-        <a href="/blog/">Blog</a>
-        <a href="#signup">Get early access</a>
-      </nav>
-    </div>
-  </header>
+<header>
+<div class="container nav">
+<a href="/" class="brand">AI Learning <span>Packager</span></a>
+<nav class="nav-links">
+<a href="#what">What it does</a>
+<a href="#who">Who it is for</a>
+<a href="/blog/">Blog</a>
+<a href="https://packager.dtttech.com" class="nav-cta">Try it free</a>
+</nav>
+</div>
+</header>
 
-  <main>
-    <section class="hero" style="border-top:none;">
-      <div class="container">
-        <div class="eyebrow">Private beta, testers wanted</div>
-        <h1>Turn any HTML into a <span class="accent">SCORM package</span> in seconds.</h1>
-        <p class="lede">Drop in an HTML file or a folder, get back a SCORM 1.2 zip ready to upload to any LMS. No authoring tool. No subscription. No locked content.</p>
+<main>
+<section class="hero" style="border-top:none;">
+<div class="container">
+<div class="eyebrow">Free to try &mdash; no sign-up</div>
+<h1>Turn any HTML into a <span class="accent">SCORM package</span> in seconds.</h1>
+<p class="lede">Drop in an HTML file or a folder, get back a SCORM 1.2 zip ready to upload to any LMS. No authoring tool. No subscription. No locked content.</p>
 
-        <div class="flow" aria-label="How it works">
-          <div class="flow-card">
-            <div class="flow-label">You upload</div>
-            <div class="flow-name">HTML</div>
-            <div class="flow-sub">or .zip course</div>
-          </div>
-          <div class="flow-arrow" aria-hidden="true">&rarr;</div>
-          <div class="flow-card highlight">
-            <div class="flow-label">The tool does</div>
-            <div class="flow-name">SCORM WRAP</div>
-            <div class="flow-sub">scripts + manifest + zip</div>
-          </div>
-          <div class="flow-arrow" aria-hidden="true">&rarr;</div>
-          <div class="flow-card">
-            <div class="flow-label">You download</div>
-            <div class="flow-name">SCORM ZIP</div>
-            <div class="flow-sub">SCORM 1.2 compliant</div>
-          </div>
-        </div>
-      </div>
-    </section>
+<div class="flow" aria-label="How it works">
+<div class="flow-card">
+<div class="flow-label">You upload</div>
+<div class="flow-name">HTML</div>
+<div class="flow-sub">or .zip course</div>
+</div>
+<div class="flow-arrow" aria-hidden="true">&rarr;</div>
+<div class="flow-card highlight">
+<div class="flow-label">The tool does</div>
+<div class="flow-name">SCORM WRAP</div>
+<div class="flow-sub">scripts + manifest + zip</div>
+</div>
+<div class="flow-arrow" aria-hidden="true">&rarr;</div>
+<div class="flow-card">
+<div class="flow-label">You download</div>
+<div class="flow-name">SCORM ZIP</div>
+<div class="flow-sub">SCORM 1.2 compliant</div>
+</div>
+</div>
+</div>
+</section>
 
-    <section id="what">
-      <div class="container">
-        <h2>What it actually does</h2>
-        <p class="section-lede">SCORM is a standard that lets a learning management system track who completed your content, what they scored, and how long they spent. Most authoring tools force you into their ecosystem to get there. This does it from any HTML.</p>
+<section id="what">
+<div class="container">
+<h2>What it actually does</h2>
+<p class="section-lede">SCORM is a standard that lets a learning management system track who completed your content, what they scored, and how long they spent. Most authoring tools force you into their ecosystem to get there. This does it from any HTML.</p>
 
-        <ul class="why-list">
-          <li>
-            <span class="why-check">&#10003;</span>
-            <div>
-              <h3>Wraps your HTML in a SCORM 1.2 manifest</h3>
-              <p>Adds the imsmanifest.xml file, the SCORM API wrapper script, and the supporting files an LMS expects. Your original HTML stays exactly as it was.</p>
-            </div>
-          </li>
-          <li>
-            <span class="why-check">&#10003;</span>
-            <div>
-              <h3>Tracks completion in any compliant LMS</h3>
-              <p>Verified end to end on Talent LMS. Should work in any SCORM 1.2 LMS, which is most of them, including Moodle, Cornerstone, Docebo, and SCORM Cloud.</p>
-            </div>
-          </li>
-          <li>
-            <span class="why-check">&#10003;</span>
-            <div>
-              <h3>Per-exercise tracking if your HTML supports it</h3>
-              <p>If your content calls the SCORM interactions API, the LMS will report per-question results. If it only reports completion at the end, that is what gets tracked.</p>
-            </div>
-          </li>
-          <li>
-            <span class="why-check">&#10003;</span>
-            <div>
-              <h3>Browser-only, no install</h3>
-              <p>Runs in your browser. Your content never leaves your machine. The output zip is yours, with no DRM, no watermark, no platform lock-in.</p>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </section>
+<ul class="why-list">
+<li>
+<span class="why-check">&#10003;</span>
+<div>
+<h3>Wraps your HTML in a SCORM 1.2 manifest</h3>
+<p>Adds the imsmanifest.xml file, the SCORM API wrapper script, and the supporting files an LMS expects. Your original HTML stays exactly as it was.</p>
+</div>
+</li>
+<li>
+<span class="why-check">&#10003;</span>
+<div>
+<h3>Tracks completion in any compliant LMS</h3>
+<p>Verified end to end on Talent LMS. Should work in any SCORM 1.2 LMS, which is most of them, including Moodle, Cornerstone, Docebo, and SCORM Cloud.</p>
+</div>
+</li>
+<li>
+<span class="why-check">&#10003;</span>
+<div>
+<h3>Per-exercise tracking if your HTML supports it</h3>
+<p>If your content calls the SCORM interactions API, the LMS will report per-question results. If it only reports completion at the end, that is what gets tracked.</p>
+</div>
+</li>
+<li>
+<span class="why-check">&#10003;</span>
+<div>
+<h3>Browser-only, no install</h3>
+<p>Runs in your browser. Your content never leaves your machine. The output zip is yours, with no DRM, no watermark, no platform lock-in.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
 
-    <section id="who">
-      <div class="container">
-        <h2>Who it is for</h2>
-        <p class="section-lede">Anyone who has working HTML content and needs it inside a learning management system.</p>
+<section id="who">
+<div class="container">
+<h2>Who it is for</h2>
+<p class="section-lede">Anyone who has working HTML content and needs it inside a learning management system.</p>
 
-        <div class="audience">
-          <div class="audience-card">
-            <h3>Instructional designers</h3>
-            <p>You built something in HTML, or with a vibe-coding tool, and need it to play nicely with the LMS your client uses.</p>
-          </div>
-          <div class="audience-card">
-            <h3>Independent course creators</h3>
-            <p>You sell or share courses and want them trackable on the LMS your buyers run, without paying Articulate.</p>
-          </div>
-          <div class="audience-card">
-            <h3>Developers building learning content</h3>
-            <p>You write HTML, CSS, and JavaScript directly. You want SCORM as a build step, not as a tool you have to learn.</p>
-          </div>
-          <div class="audience-card">
-            <h3>Enterprise L&amp;D teams</h3>
-            <p>You have content in formats your LMS does not accept, and you need a fast, predictable way to wrap it.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+<div class="audience">
+<div class="audience-card">
+<h3>Instructional designers</h3>
+<p>You built something in HTML, or with a vibe-coding tool, and need it to play nicely with the LMS your client uses.</p>
+</div>
+<div class="audience-card">
+<h3>Independent course creators</h3>
+<p>You sell or share courses and want them trackable on the LMS your buyers run, without paying Articulate.</p>
+</div>
+<div class="audience-card">
+<h3>Developers building learning content</h3>
+<p>You write HTML, CSS, and JavaScript directly. You want SCORM as a build step, not as a tool you have to learn.</p>
+</div>
+<div class="audience-card">
+<h3>Enterprise L&amp;D teams</h3>
+<p>You have content in formats your LMS does not accept, and you need a fast, predictable way to wrap it.</p>
+</div>
+</div>
+</div>
+</section>
 
-    <section id="blog">
-      <div class="container">
-        <h2>From the blog</h2>
-        <p class="section-lede">Practical, opinionated notes on SCORM, xAPI, and the gap between AI-generated content and the systems that have to host it.</p>
+<section id="blog">
+<div class="container">
+<h2>From the blog</h2>
+<p class="section-lede">Practical, opinionated notes on SCORM, xAPI, and the gap between AI-generated content and the systems that have to host it.</p>
 
-        <div class="blog-list" id="blog-teaser">
-          <a href="/blog/why-authoring-tools-hide-scorm-api.html" class="blog-card" data-publish-date="2026-07-07">
-            <p class="blog-meta">7 July 2026, 8 minute read</p>
-            <h3>Why authoring tools hide the SCORM API from you, and what you can do about it</h3>
-            <p>An honest look at the gap between what SCORM 1.2 actually offers and what authoring tools let you reach.</p>
-            <span class="read-more">Read post &rarr;</span>
-          </a>
-          <a href="/blog/testing-scorm-before-client.html" class="blog-card" data-publish-date="2026-06-30">
-            <p class="blog-meta">30 June 2026, 7 minute read</p>
-            <h3>How to test a SCORM package before sending it to a client</h3>
-            <p>A practical testing routine for SCORM packages. Catches the failure that would otherwise have embarrassed you.</p>
-            <span class="read-more">Read post &rarr;</span>
-          </a>
-          <a href="/blog/minimum-viable-scorm-manifest.html" class="blog-card" data-publish-date="2026-06-23">
-            <p class="blog-meta">23 June 2026, 9 minute read</p>
-            <h3>The minimum viable SCORM manifest, explained line by line</h3>
-            <p>The smallest valid SCORM 1.2 imsmanifest, explained without the historical detours.</p>
-            <span class="read-more">Read post &rarr;</span>
-          </a>
-          <a href="/blog/scorm-cloud-versus-client-lms.html" class="blog-card" data-publish-date="2026-06-16">
-            <p class="blog-meta">16 June 2026, 7 minute read</p>
-            <h3>Why your SCORM package works in SCORM Cloud but not in your client's LMS</h3>
-            <p>A practical debugging guide for the most universal frustration in instructional design.</p>
-            <span class="read-more">Read post &rarr;</span>
-          </a>
-          <a href="/blog/xapi-versus-scorm-1-2.html" class="blog-card" data-publish-date="2026-06-09">
-            <p class="blog-meta">9 June 2026, 8 minute read</p>
-            <h3>xAPI versus SCORM 1.2 in 2026, an honest comparison</h3>
-            <p>xAPI was supposed to replace SCORM years ago. SCORM 1.2 is still what every LMS actually runs on. Here is the honest version of why.</p>
-            <span class="read-more">Read post &rarr;</span>
-          </a>
-          <a href="/blog/what-scorm-actually-tracks.html" class="blog-card" data-publish-date="2026-05-28">
-            <p class="blog-meta">28 May 2026, 6 minute read</p>
-            <h3>What SCORM actually tracks</h3>
-            <p>A short, practical guide for anyone who has ever sworn at an LMS upload screen.</p>
-            <span class="read-more">Read post &rarr;</span>
-          </a>
-        </div>
+<div class="blog-list" id="blog-teaser">
+<a href="/blog/why-authoring-tools-hide-scorm-api.html" class="blog-card" data-publish-date="2026-07-07">
+<p class="blog-meta">7 July 2026, 8 minute read</p>
+<h3>Why authoring tools hide the SCORM API from you, and what you can do about it</h3>
+<p>An honest look at the gap between what SCORM 1.2 actually offers and what authoring tools let you reach.</p>
+<span class="read-more">Read post &rarr;</span>
+</a>
+<a href="/blog/testing-scorm-before-client.html" class="blog-card" data-publish-date="2026-06-30">
+<p class="blog-meta">30 June 2026, 7 minute read</p>
+<h3>How to test a SCORM package before sending it to a client</h3>
+<p>A practical testing routine for SCORM packages. Catches the failure that would otherwise have embarrassed you.</p>
+<span class="read-more">Read post &rarr;</span>
+</a>
+<a href="/blog/minimum-viable-scorm-manifest.html" class="blog-card" data-publish-date="2026-06-23">
+<p class="blog-meta">23 June 2026, 9 minute read</p>
+<h3>The minimum viable SCORM manifest, explained line by line</h3>
+<p>The smallest valid SCORM 1.2 imsmanifest, explained without the historical detours.</p>
+<span class="read-more">Read post &rarr;</span>
+</a>
+<a href="/blog/scorm-cloud-versus-client-lms.html" class="blog-card" data-publish-date="2026-06-16">
+<p class="blog-meta">16 June 2026, 7 minute read</p>
+<h3>Why your SCORM package works in SCORM Cloud but not in your client's LMS</h3>
+<p>A practical debugging guide for the most universal frustration in instructional design.</p>
+<span class="read-more">Read post &rarr;</span>
+</a>
+<a href="/blog/xapi-versus-scorm-1-2.html" class="blog-card" data-publish-date="2026-06-09">
+<p class="blog-meta">9 June 2026, 8 minute read</p>
+<h3>xAPI versus SCORM 1.2 in 2026, an honest comparison</h3>
+<p>xAPI was supposed to replace SCORM years ago. SCORM 1.2 is still what every LMS actually runs on. Here is the honest version of why.</p>
+<span class="read-more">Read post &rarr;</span>
+</a>
+<a href="/blog/what-scorm-actually-tracks.html" class="blog-card" data-publish-date="2026-05-28">
+<p class="blog-meta">28 May 2026, 6 minute read</p>
+<h3>What SCORM actually tracks</h3>
+<p>A short, practical guide for anyone who has ever sworn at an LMS upload screen.</p>
+<span class="read-more">Read post &rarr;</span>
+</a>
+</div>
 
-        <p class="see-all"><a href="/blog/">See all posts &rarr;</a></p>
-      </div>
-    </section>
+<p class="see-all"><a href="/blog/">See all posts &rarr;</a></p>
+</div>
+</section>
 
-    <section id="signup">
-      <div class="container">
-        <div class="cta">
-          <h2>Be one of the first to try it</h2>
-          <p>We are looking for three to five early testers. Twenty minutes of your time, honest feedback, no commitments.</p>
+<section id="try">
+<div class="container">
+<div class="cta">
+<h2>Try it free &mdash; one package, no sign-up</h2>
+<p>Use code <strong style="color:var(--teal);letter-spacing:0.05em;">TRYDTT</strong> on the packager to wrap your first HTML course at no cost. For unlimited access, a single seat licence is &pound;49 &mdash; buy once, no subscription.</p>
+<a href="https://packager.dtttech.com" class="cta-btn">Open the packager &rarr;</a>
+<p class="cta-note">Need team access? <a href="mailto:michael@dtttech.com" style="color:var(--teal);">Contact us for a site licence.</a></p>
+</div>
+</div>
+</section>
+</main>
 
-          <form
-            name="early-access"
-            method="POST"
-            data-netlify="true"
-            data-netlify-honeypot="bot-field"
-            action="/thanks.html"
-            class="signup-form"
-          >
-            <input type="hidden" name="form-name" value="early-access">
-            <p class="hp-field">
-              <label>Do not fill this out if you are human: <input name="bot-field"></label>
-            </p>
-            <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
-            <button type="submit">Request access</button>
-          </form>
-          <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
-        </div>
-      </div>
-    </section>
-  </main>
+<footer>
+<div class="container">
+<p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+</div>
+</footer>
 
-  <footer>
-    <div class="container">
-      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
-    </div>
-  </footer>
-
-  <script>
-    // Hide future-dated blog teaser cards and limit to 3 visible posts.
-    (function() {
-      var today = new Date().toISOString().slice(0, 10);
-      var cards = document.querySelectorAll("#blog-teaser .blog-card[data-publish-date]");
-      var shown = 0;
-      cards.forEach(function(card) {
-        var d = card.getAttribute("data-publish-date");
-        if (d && d > today) {
-          card.style.display = "none";
-        } else if (shown >= 3) {
-          card.style.display = "none";
-        } else {
-          shown++;
-        }
-      });
-    })();
-  </script>
+<script>
+// Hide future-dated blog teaser cards and limit to 3 visible posts.
+(function() {
+var today = new Date().toISOString().slice(0, 10);
+var cards = document.querySelectorAll("#blog-teaser .blog-card[data-publish-date]");
+var shown = 0;
+cards.forEach(function(card) {
+var d = card.getAttribute("data-publish-date");
+if (d && d > today) {
+card.style.display = "none";
+} else if (shown >= 3) {
+card.style.display = "none";
+} else {
+shown++;
+}
+});
+})();
+</script>
 </body>
 </html>
