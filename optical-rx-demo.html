@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optical Prescription Reading — Interactive Exercise</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f5f4f0; color: #1a1a18; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2.5rem 1rem; }
+  .shell { width: 100%; max-width: 680px; }
+  .course-header { margin-bottom: 2rem; }
+  .course-tag { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #185fa5; background: #e6f1fb; border-radius: 4px; padding: 3px 10px; margin-bottom: 0.75rem; }
+  .course-header h1 { font-size: 22px; font-weight: 500; color: #1a1a18; margin-bottom: 0.4rem; line-height: 1.3; }
+  .course-header p { font-size: 14px; color: #5f5e5a; line-height: 1.6; }
+  .card { background: #ffffff; border: 0.5px solid #d3d1c7; border-radius: 12px; padding: 2rem; }
+  .progress-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.75rem; }
+  .progress-track { flex: 1; height: 4px; background: #e8e6e0; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #378add; border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+  .progress-label { font-size: 12px; color: #888780; white-space: nowrap; min-width: 60px; text-align: right; }
+  .q-label { font-size: 12px; font-weight: 500; color: #888780; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .scenario-intro { font-size: 15px; color: #444441; line-height: 1.65; margin-bottom: 1.5rem; }
+  .rx-card { background: #f9f8f5; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 1.125rem 1.375rem; margin-bottom: 1.5rem; }
+  .rx-card-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 0.5px solid #d3d1c7; margin-bottom: 0.875rem; }
+  .rx-card-title { font-size: 11px; font-weight: 500; color: #888780; letter-spacing: 0.06em; text-transform: uppercase; }
+  .rx-card-ref { font-size: 11px; color: #b4b2a9; }
+  .rx-table { width: 100%; border-collapse: collapse; }
+  .rx-table th { font-size: 10px; font-weight: 500; color: #888780; letter-spacing: 0.06em; text-transform: uppercase; text-align: center; padding: 0 0 8px; }
+  .rx-table th:first-child { text-align: left; }
+  .rx-table td { text-align: center; padding: 9px 0; font-size: 15px; font-weight: 500; color: #1a1a18; border-top: 0.5px solid #e8e6e0; }
+  .rx-table td:first-child { text-align: left; font-size: 12px; font-weight: 500; color: #888780; }
+  .eye-r { color: #185fa5; } .eye-l { color: #5f5e5a; }
+  .rx-footnote { font-size: 11px; color: #b4b2a9; margin-top: 0.75rem; line-height: 1.5; }
+  .choices { display: grid; gap: 8px; margin-bottom: 1.25rem; }
+  .choice-btn { background: #ffffff; border: 0.5px solid #c8c6bc; border-radius: 8px; padding: 0.8rem 1rem; text-align: left; cursor: pointer; font-size: 14px; font-family: inherit; color: #1a1a18; line-height: 1.45; transition: border-color 0.15s, background 0.15s; }
+  .choice-btn:hover:not(:disabled) { background: #f5f4f0; border-color: #888780; }
+  .choice-btn:disabled { cursor: default; }
+  .choice-btn.correct { background: #eaf3de; border-color: #639922; color: #3b6d11; }
+  .choice-btn.wrong { background: #fcebeb; border-color: #e24b4a; color: #a32d2d; }
+  .feedback { border-radius: 8px; padding: 0.875rem 1rem; font-size: 14px; line-height: 1.65; margin-bottom: 1.25rem; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: #eaf3de; color: #3b6d11; border-left: 3px solid #639922; }
+  .feedback.wrong { background: #fcebeb; color: #a32d2d; border-left: 3px solid #e24b4a; }
+  .nav-btn { background: #ffffff; border: 0.5px solid #c8c6bc; border-radius: 8px; padding: 0.625rem 1.25rem; font-size: 14px; font-family: inherit; color: #1a1a18; cursor: pointer; display: none; transition: background 0.15s; }
+  .nav-btn.show { display: inline-block; } .nav-btn:hover { background: #f5f4f0; }
+  .score-panel { text-align: center; padding: 1rem 0; }
+  .score-ring { width: 100px; height: 100px; margin: 0 auto 1.25rem; position: relative; }
+  .score-ring svg { width: 100px; height: 100px; }
+  .score-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 500; color: #1a1a18; }
+  .score-headline { font-size: 18px; font-weight: 500; color: #1a1a18; margin-bottom: 0.5rem; }
+  .score-sub { font-size: 14px; color: #5f5e5a; margin-bottom: 1.75rem; line-height: 1.6; max-width: 380px; margin-left: auto; margin-right: auto; }
+  .score-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.75rem; }
+  .score-cell { background: #f5f4f0; border: 0.5px solid #d3d1c7; border-radius: 8px; padding: 0.875rem; text-align: center; }
+  .score-cell-n { font-size: 22px; font-weight: 500; color: #1a1a18; }
+  .score-cell-l { font-size: 12px; color: #888780; margin-top: 3px; }
+  .pass { color: #3b6d11; } .fail { color: #a32d2d; }
+  .restart-btn { background: #ffffff; border: 0.5px solid #c8c6bc; border-radius: 8px; padding: 0.625rem 1.5rem; font-size: 14px; font-family: inherit; color: #1a1a18; cursor: pointer; transition: background 0.15s; }
+  .restart-btn:hover { background: #f5f4f0; }
+  .course-footer { margin-top: 1.5rem; text-align: center; font-size: 12px; color: #b4b2a9; }
+  @media (max-width: 480px) { body { padding: 1rem 0.75rem; } .card { padding: 1.25rem; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="course-header">
+    <div class="course-tag">Optical dispensing</div>
+    <h1>Reading and interpreting optical prescriptions</h1>
+    <p>Practice identifying patient conditions from Rx values across four clinical scenarios.</p>
+  </div>
+  <div class="card">
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+      <div class="progress-label" id="prog-label">0 / 4</div>
+    </div>
+    <div id="quiz"></div>
+  </div>
+  <div class="course-footer">
+    Example built by <a href="https://dtttech.com" style="color:#888780;">Digital Technology Training</a> &nbsp;·&nbsp; dtttech.com
+  </div>
+</div>
+<script>
+const questions=[{intro:"A patient presents for a routine eye test. Their prescription is recorded below. What is the primary condition indicated?",rx:{R:{sph:"-2.75",cyl:"plano",axis:"—",add:"—"},L:{sph:"-3.25",cyl:"plano",axis:"—",add:"—"}},ref:"Ref: OT-001",choices:["Hyperopia (long-sightedness)","Myopia (short-sightedness)","Astigmatism","Presbyopia"],correct:1,feedback_correct:"Correct. Negative sphere values indicate myopia. The patient is short-sighted — the eye is focusing in front of the retina. The higher the negative value, the stronger the correction needed.",feedback_wrong:"Not quite. Negative sphere values always indicate myopia. Positive values indicate hyperopia. The CYL column here is plano (zero), so no astigmatism is present."},{intro:"A patient aged 52 returns for a new pair of glasses. Their prescription has changed since their last visit. What conditions does this Rx indicate?",rx:{R:{sph:"+1.50",cyl:"-0.75",axis:"90",add:"+2.00"},L:{sph:"+1.25",cyl:"-1.00",axis:"85",add:"+2.00"}},ref:"Ref: OT-002",choices:["Myopia and presbyopia","Hyperopia with astigmatism only","Hyperopia, astigmatism, and presbyopia","Astigmatism and presbyopia only"],correct:2,feedback_correct:"Correct. Positive sphere = hyperopia. CYL values present = astigmatism. An ADD power of +2.00 indicates presbyopia — the loss of near-focus accommodation typically seen from the mid-40s onwards.",feedback_wrong:"Not quite. Work through each column: positive SPH = hyperopia, CYL present = astigmatism, ADD present = presbyopia. All three conditions are indicated in this prescription."},{intro:"A patient reports blurred vision at all distances, particularly affecting horizontal lines. Their prescription is below. Which best describes the main visual condition?",rx:{R:{sph:"plano",cyl:"-2.50",axis:"180",add:"—"},L:{sph:"-0.25",cyl:"-2.25",axis:"175",add:"—"}},ref:"Ref: OT-003",choices:["High myopia","Simple astigmatism (right eye) with myopic astigmatism (left eye)","Hyperopic astigmatism","Presbyopia with astigmatism"],correct:1,feedback_correct:"Correct. The right eye has plano sphere with significant CYL — pure astigmatism with no myopia or hyperopia. The left has a small myopic component alongside astigmatism. Axis near 180° means the astigmatism affects the horizontal meridian, explaining the blurred horizontal lines.",feedback_wrong:"Look at the sphere column first — plano (zero) in the right eye rules out myopia or hyperopia as the primary condition. The significant CYL values with axis near 180° point to astigmatism as the dominant condition."},{intro:"A dispensing technician is issuing a patient's first pair of multifocal lenses. The prescription below includes a near addition. What is the full near-vision power for the right eye?",rx:{R:{sph:"-1.00",cyl:"-0.50",axis:"90",add:"+2.25"},L:{sph:"-0.75",cyl:"-0.75",axis:"95",add:"+2.25"}},ref:"Ref: OT-004",choices:["+2.25 DS","-1.00 / -0.50 × 90","+1.25 / -0.50 × 90","-0.25 DS"],correct:2,feedback_correct:"Correct. Near power = distance sphere + ADD. Right eye: −1.00 + 2.25 = +1.25. The CYL and axis remain unchanged for the near segment. Full near Rx for the right eye: +1.25 / −0.50 × 90.",feedback_wrong:"To find near power: add the ADD to the distance sphere. Right eye: −1.00 + 2.25 = +1.25. The cylinder and axis don't change. Near Rx for the right eye = +1.25 / −0.50 × 90."}];
+let current=0,score=0,answered=false;
+function rxRow(label,d,cls){return `<tr><td class="${cls}">${label}</td><td>${d.sph}</td><td>${d.cyl}</td><td>${d.axis}</td><td>${d.add}</td></tr>`;}
+function render(){const q=questions[current];document.getElementById('prog').style.width=(current/questions.length*100)+'%';document.getElementById('prog-label').textContent=current+' / '+questions.length;document.getElementById('quiz').innerHTML=`<div class="q-label">Question ${current+1} of ${questions.length}</div><p class="scenario-intro">${q.intro}</p><div class="rx-card"><div class="rx-card-header"><span class="rx-card-title">Optometric prescription</span><span class="rx-card-ref">${q.ref}</span></div><table class="rx-table"><thead><tr><th></th><th>SPH</th><th>CYL</th><th>Axis</th><th>ADD</th></tr></thead><tbody>${rxRow('Right (R)',q.rx.R,'eye-r')}${rxRow('Left (L)',q.rx.L,'eye-l')}</tbody></table><p class="rx-footnote">Plano = zero power &amp;nbsp;·&amp;nbsp; ADD = near addition &amp;nbsp;·&amp;nbsp; Axis in degrees</p></div><div class="choices" id="choices">${q.choices.map((c,i)=>`<button class="choice-btn" onclick="choose(${i})">${c}</button>`).join('')}</div><div class="feedback" id="feedback"></div><button class="nav-btn" id="navbtn" onclick="next()">${current<questions.length-1?'Next question →':'See results →'}</button>`;answered=false;}
+function choose(i){if(answered)return;answered=true;const q=questions[current];const btns=document.querySelectorAll('.choice-btn');const fb=document.getElementById('feedback');btns.forEach(b=>b.disabled=true);btns[q.correct].classList.add('correct');if(i===q.correct){score++;fb.className='feedback correct show';fb.textContent=q.feedback_correct;}else{btns[i].classList.add('wrong');fb.className='feedback wrong show';fb.textContent=q.feedback_wrong;}document.getElementById('navbtn').classList.add('show');}
+function next(){current++;if(current>=questions.length){showScore();return;}render();}
+function showScore(){const pct=Math.round(score/questions.length*100);const pass=pct>=80;const c=2*Math.PI*38;const dash=(pct/100)*c;const msg=pct===100?"Full marks. Excellent command of prescription interpretation.":pct>=75?"Good result. Review the explanations for any questions you missed before moving on.":"Worth working back through the material. Focus on how sphere, cylinder, and ADD values map to patient conditions.";document.getElementById('prog').style.width='100%';document.getElementById('prog-label').textContent='4 / 4';document.getElementById('quiz').innerHTML=`<div class="score-panel"><div class="score-ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="#e8e6e0" stroke-width="6"/><circle cx="50" cy="50" r="38" fill="none" stroke="${pass?'#639922':'#e24b4a'}" stroke-width="6" stroke-dasharray="${dash.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 50 50)"/></svg><div class="score-text">${pct}%</div></div><div class="score-headline">${score} of ${questions.length} correct</div><div class="score-sub">${msg}</div><div class="score-summary"><div class="score-cell"><div class="score-cell-n">${score}</div><div class="score-cell-l">Correct</div></div><div class="score-cell"><div class="score-cell-n">${questions.length-score}</div><div class="score-cell-l">Incorrect</div></div><div class="score-cell"><div class="score-cell-n ${pass?'pass':'fail'}">${pass?'✓':'✗'}</div><div class="score-cell-l">${pass?'Pass':'Not yet'}</div></div></div><button class="restart-btn" onclick="restart()">Restart exercise</button></div>`;}
+function restart(){current=0;score=0;render();}
+render();
+</script>
+</body>
+</html>
