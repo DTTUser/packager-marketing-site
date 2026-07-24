@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from datetime import datetime
 
-BLOG_DIR = Path("/sessions/ecstatic-jolly-fermat/mnt/SCORM wrapper for Vibe Code/Marketing_Site/blog")
+BLOG_DIR = Path(__file__).resolve().parent.parent / "blog"
 
 def parse_frontmatter(text):
     if not text.startswith("---"):
@@ -122,7 +122,7 @@ INDEX_TEMPLATE = """<!doctype html>
         <a href="/#what">What it does</a>
         <a href="/#who">Who it is for</a>
         <a href="/blog/">Blog</a>
-        <a href="/#signup">Get early access</a>
+        <a href="https://packager.dtttech.com">Get early access</a>
       </nav>
     </div>
   </header>
@@ -143,7 +143,7 @@ __POST_CARDS__
       <div class="cta">
         <h2>Want to try the tool the blog is from?</h2>
         <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds.</p>
-        <a href="/#signup" class="cta-button">Request access</a>
+        <a href="https://packager.dtttech.com" class="cta-button">Request access</a>
       </div>
     </div>
   </main>

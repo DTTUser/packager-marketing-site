@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Storyline got an AI Assistant. Here is what it still will not touch, AI Learning Packager</title>
+  <meta name="description" content="Articulate's AI Assistant promises Storyline authors stay in the driver's seat. A close look at what it actually automates versus what stays entirely manual, and what that split reveals about who really controls an AI-built course.">
+
+  <meta property="og:title" content="Storyline got an AI Assistant. Here is what it still will not touch">
+  <meta property="og:description" content="Storyline's AI writes better copy and syncs your timelines. It still will not touch a single trigger. Here is why that is not an accident.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://packager.dtttech.com/blog/storylines-ai-assistant-and-the-part-it-wont-touch">
+  <meta property="og:image" content="https://packager.dtttech.com/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230a0e27'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle' fill='%2300d4aa' font-family='Helvetica,Arial' font-weight='800'%3EP%3C/text%3E%3C/svg%3E">
+
+  <style>
+    :root {
+      --navy-deep: #0a0e27;
+      --navy-mid: #151a3d;
+      --navy-card: #1a2050;
+      --navy-border: #1e2650;
+      --teal: #00d4aa;
+      --teal-deep: #00b894;
+      --text-white: #f0f4ff;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy-mid));
+      color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6; min-height: 100vh;
+    }
+    body { background-attachment: fixed; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    .container-wide { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 24px 0; border-bottom: 1px solid var(--navy-border); }
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .brand { font-weight: 800; font-size: 18px; color: var(--text-white); text-decoration: none; letter-spacing: -0.3px; }
+    .brand span { color: var(--teal); }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; }
+    .nav-links a:hover { color: var(--teal); }
+    .article-header { padding: 64px 0 32px; text-align: left; }
+    .eyebrow { display: inline-block; color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: 4px; margin-bottom: 20px; text-transform: uppercase; }
+    h1 { font-size: clamp(32px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin: 0 0 20px; }
+    .article-meta { color: var(--text-muted); font-size: 14px; margin: 0 0 8px; }
+    .article-meta a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted var(--text-muted); }
+    .article-meta a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+    .lede { font-size: 19px; color: var(--text-muted); font-style: italic; margin: 24px 0 0; padding-left: 16px; border-left: 3px solid var(--teal); }
+    article { padding: 32px 0 64px; }
+    article h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin: 48px 0 16px; color: var(--text-white); }
+    article h2:first-of-type { margin-top: 0; }
+    article h3 { font-size: 19px; font-weight: 700; margin: 32px 0 12px; color: var(--text-white); }
+    article p { font-size: 17px; line-height: 1.7; color: var(--text-white); margin: 0 0 20px; }
+    article ul, article ol { margin: 0 0 20px; padding-left: 24px; }
+    article li { font-size: 17px; line-height: 1.7; color: var(--text-white); margin-bottom: 8px; }
+    article a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(0, 212, 170, 0.4); }
+    article a:hover { border-bottom-color: var(--teal); }
+    article hr { border: none; border-top: 1px solid var(--navy-border); margin: 48px 0 32px; }
+    article code { font-family: "SF Mono", Menlo, Monaco, Consolas, monospace; font-size: 14px; background: var(--navy-deep); border: 1px solid var(--navy-border); padding: 2px 6px; border-radius: 4px; color: var(--teal); }
+    article blockquote { margin: 0 0 24px; padding: 16px 20px; border-left: 3px solid var(--teal); background: var(--navy-card); border-radius: 0 8px 8px 0; }
+    article blockquote p { margin: 0; color: var(--text-muted); font-style: italic; }
+    .cta-section { padding: 0 0 64px; }
+    .cta { background: linear-gradient(180deg, var(--navy-card), var(--navy-mid)); border: 1px solid var(--navy-border); border-radius: 20px; padding: 48px; text-align: center; }
+    .cta h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 12px; }
+    .cta p { color: var(--text-muted); margin: 0 0 28px; font-size: 16px; }
+    .signup-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto; flex-wrap: wrap; }
+    .signup-form input[type="email"] { flex: 1; min-width: 240px; padding: 14px 18px; border-radius: 30px; border: 1px solid var(--navy-border); background: var(--navy-deep); color: var(--text-white); font-size: 15px; font-family: inherit; }
+    .signup-form input[type="email"]:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,212,170,0.2); }
+    .signup-form button { padding: 14px 28px; border-radius: 30px; border: none; background: var(--teal); color: var(--navy-deep); font-weight: 700; font-size: 15px; cursor: pointer; font-family: inherit; transition: background 0.15s ease; }
+    .signup-form button:hover { background: var(--teal-deep); }
+    .form-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+    .hp-field { position: absolute; left: -5000px; visibility: hidden; }
+    footer { padding: 40px 0; border-top: 1px solid var(--navy-border); color: var(--text-muted); font-size: 14px; text-align: center; }
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container-wide nav">
+      <a href="/" class="brand">AI Learning <span>Packager</span></a>
+      <nav class="nav-links">
+        <a href="/#what">What it does</a>
+        <a href="/#who">Who it is for</a>
+        <a href="/blog/">Blog</a>
+        <a href="https://packager.dtttech.com">Get early access</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="article-header">
+        <div class="eyebrow">From the blog</div>
+        <h1>Storyline got an AI Assistant. Here is what it still will not touch</h1>
+        <p class="article-meta">24 July 2026, by <a href="https://dtttech.com">Michael at Digital Technology Training</a>. About 7 minutes to read.</p>
+        <p class="lede">Articulate says Storyline's AI Assistant keeps you in the driver's seat. Look at what it is actually driving, and the claim gets a lot more interesting.</p>
+      </div>
+      <article>
+        <h2>The claim</h2>
+<p>Articulate's marketing for Storyline 360's AI Assistant leads with a specific promise. You stay "in the driver's seat." It "speeds up course creation, without taking over." That is a reassuring thing to say to instructional designers who have spent years watching software vendors quietly decide what they are allowed to touch. It also turns out to be a much narrower promise than it sounds, once you look at what the AI is actually allowed to drive.</p>
+        <h2>What the AI Assistant actually does</h2>
+<p>Look at what shipped across the Q1 and Q2 2026 releases. The AI Assistant can generate AI voiceover from thousands of voices, so a script change no longer means a studio booking. It can sync slide timelines and on-screen elements to your narration automatically, instead of hand-nudging keyframes. It can generate a cohesive theme colour palette from a reference image or a text description. It can edit an AI-generated image through chat without restarting the whole generation. And it can polish written text: tone, grammar, length, reading level.</p>
+<p>That is a genuinely useful list. None of it is nothing. But look at the shape of it. Every item on it is content, media, or formatting. Voice, colour, copy, timing. The stuff that used to eat an afternoon and now takes a prompt.</p>
+        <h2>What it does not do</h2>
+<p>Here is what is not on that list, in any release note Articulate has published this year. AI Assistant does not write a variable. It does not build a branching path. It does not wire up a trigger. It does not construct a scored interaction. Ask it to add a knowledge check that sends the learner down a different path depending on their answer, and you are back to doing it by hand, exactly as you were in 2019.</p>
+<p>That is not a criticism of the feature. It is an observation about where the line was drawn.</p>
+        <h2>Why that split is not an accident</h2>
+<p>Three reasons, and they are the same three reasons authoring tools have always drawn lines around what they expose.</p>
+<p>Automating copy and colour is low risk. It is reversible, cosmetic, and no course architecture depends on it. Automating branching and variable logic is a different proposition entirely, because that is the part of the job that is genuinely hard to learn, genuinely slow to build by hand, and genuinely the reason a lot of teams still pay per seat for Storyline instead of hiring a developer. If the AI Assistant could brief a full branching scenario as easily as it can brief a colour palette, the tool's core value proposition gets a lot thinner. You would be paying for a nicer interface around something an AI could now do directly.</p>
+<p>So the AI stops exactly where the licence's value begins. That is not a scandal. It is a company protecting the part of the product that is actually the product.</p>
+        <h2>Two different ways to stay in charge</h2>
+<p>"You stay in charge" is doing a lot of work in that marketing line, and it is worth asking in charge of what.</p>
+<p>In Storyline, you stay in charge of the easy eighty percent because the AI has taken it off your plate, and you stay in charge of the hard twenty percent because nobody has offered to take it. That is not really a choice. It is the only option that was ever on the table.</p>
+<p>Build the course in HTML with an AI coding tool instead, and the shape of "in charge" changes. You are still briefing the work, still reviewing every screen, still the one deciding whether a branch makes sense. The difference is that the AI is doing the hard part too, the variables and the triggers and the scored logic, alongside the easy part, and you are supervising all of it rather than being handed back only the pieces nobody wanted to automate. You are in charge of the whole course, not just the parts that were safe to delegate. And at the end you own the actual files, not a licence to reopen them.</p>
+        <h2>Where the packager fits</h2>
+<p>Since this is our blog, the disclosure. We build the <a href="https://packager.dtttech.com">AI Learning Packager</a>, which takes HTML you or an AI built, wraps it as a SCORM 1.2 package, and gets out of the way. We are not arguing that Storyline's AI Assistant is bad. Sync-to-timeline and AI voiceover are genuinely good features, and we would use them too if we were still authoring in Storyline. We are arguing that "you stay in charge" means something different depending on whether the AI is allowed anywhere near the actual interactivity, and right now, inside Storyline, it is not.</p>
+        <h2>Closing thought</h2>
+<p>Articulate did not build a weak AI feature. They built a well-scoped one, and scoping it around the licence's own value is a sensible business decision, not a mistake. But the honest headline is not "Storyline's AI Assistant lets you stay in charge." It is "Storyline's AI Assistant lets you stay in charge of the parts that were never going to threaten the subscription." Worth knowing which kind of in charge you are being sold before you decide whether that is enough.</p>
+<hr />
+<p><em>Written by Michael at <a href="https://dtttech.com">Digital Technology Training</a>. The AI Learning Packager is in private beta. If you want an AI to build the branching and variables too, not just the copy and the colour palette, request access below.</em></p>
+      </article>
+    </div>
+    <div class="container-wide cta-section">
+      <div class="cta">
+        <h2>Try the packager</h2>
+        <p>Private beta. Drop in an HTML file or folder, get back a SCORM 1.2 zip in seconds. Free for early testers.</p>
+        <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thanks.html" class="signup-form">
+          <input type="hidden" name="form-name" value="early-access">
+          <p class="hp-field"><label>Do not fill this out if you are human: <input name="bot-field"></label></p>
+          <input type="email" name="email" placeholder="you@example.com" required aria-label="Your email">
+          <button type="submit">Request access</button>
+        </form>
+        <p class="form-note">We will email you the live URL and a short brief. Your address is not shared.</p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <div class="container-wide">
+      <p>A project from <a href="https://dtttech.com">Digital Technology Training</a>. Built in public.</p>
+    </div>
+  </footer>
+</body>
+</html>
